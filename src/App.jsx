@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import logo from './assets/images/logo.png';
 import heroBg from './assets/images/hero-bg.png';
 import Admin from './Admin';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
+import Safety from './Safety';
+import CookiePolicy from './CookiePolicy';
+import Contact from './Contact';
 
 /* ─── Scroll-reveal hook ─── */
 function useReveal() {
@@ -24,6 +29,15 @@ function useReveal() {
     return () => obs.disconnect();
   }, []);
   return ref;
+}
+
+/* ─── Scroll to top on route change ─── */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
 }
 
 function RevealSection({ children, className = '', ...props }) {
@@ -175,26 +189,6 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            <img src={logo} alt="LoveHuddle" className="footer-logo" />
-            <p className="footer-tagline">A calmer, more human way to meet people.</p>
-          </div>
-          <div className="footer-col">
-            <h4>Platform</h4>
-            <a href="#disruption">The Disruption</a>
-            <a href="#roadmap">The Roadmap</a>
-            <a href="#articles">Articles</a>
-          </div>
-        </div>
-        <div className="footer-divider"></div>
-        <div className="footer-bottom-bar">
-          <p>© 2026 LoveHuddle Ltd. Architected in Wales. Built for the UK.</p>
-          <p className="footer-made">Made with ♡ for meaningful connection.</p>
-        </div>
-      </footer>
 
       {/* Blog Modal */}
       {activeBlog && (
@@ -336,10 +330,45 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
         </div>
       </nav>
 
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Landing blogPosts={blogPosts} activeBlog={activeBlog} setActiveBlog={setActiveBlog} onJoinWaitlist={addToWaitlist} />} />
         <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onDeletePost={deletePost} waitlist={waitlist} />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/safety" element={<Safety />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <img src={logo} alt="LoveHuddle" className="footer-logo" />
+            <p className="footer-tagline">A calmer, more human way to meet people.</p>
+          </div>
+          <div className="footer-col">
+            <h4>Platform</h4>
+            <Link to="/#disruption">The Disruption</Link>
+            <Link to="/#roadmap">The Roadmap</Link>
+            <Link to="/#articles">Articles</Link>
+          </div>
+          <div className="footer-col">
+            <h4>Legal &amp; Info</h4>
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms of Service</Link>
+            <Link to="/safety">Safety &amp; Support</Link>
+            <Link to="/cookies">Cookie Policy</Link>
+            <Link to="/contact">Contact Us</Link>
+          </div>
+        </div>
+        <div className="footer-divider"></div>
+        <div className="footer-bottom-bar">
+          <p>© 2026 LoveHuddle Ltd. All Rights Reserved.</p>
+          <p className="footer-legal-small">Registered in England &amp; Wales | Company No: 16971133 | LoveHuddle™ is a trademark of LoveHuddle Ltd.</p>
+        </div>
+      </footer>
     </div>
   );
 }

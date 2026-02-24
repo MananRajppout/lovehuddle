@@ -1,0 +1,243 @@
+/* ================================================
+   LOVEHUDDLE — Legal.css (Privacy Policy, Contact)
+   ================================================ */
+
+.legal-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 120px 32px 80px;
+}
+
+.legal-back {
+    display: inline-block !important;
+    width: auto !important;
+    margin-bottom: 2.5rem;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1.25rem !important;
+}
+
+.legal-page h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    margin-bottom: 0.5rem;
+    background: var(--lh-gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.legal-subtitle {
+    color: var(--lh-text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.legal-updated {
+    color: var(--lh-text-muted);
+    font-size: 0.85rem;
+    opacity: 0.6;
+    margin-bottom: 3rem;
+}
+
+.legal-page section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--lh-border-subtle);
+}
+
+.legal-page section:last-child {
+    border-bottom: none;
+}
+
+.legal-page h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--lh-text);
+    font-weight: 700;
+}
+
+.legal-page h3 {
+    font-size: 1rem;
+    margin: 1.5rem 0 0.6rem;
+    color: var(--lh-skin-light);
+    font-weight: 600;
+}
+
+.legal-page p {
+    color: var(--lh-text-muted);
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.legal-page ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 1rem;
+}
+
+.legal-page li {
+    color: var(--lh-text-muted);
+    padding: 0.35rem 0 0.35rem 1.5rem;
+    position: relative;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.legal-page li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--lh-red);
+    opacity: 0.6;
+}
+
+.legal-page li strong {
+    color: var(--lh-text);
+}
+
+.legal-highlight {
+    color: var(--lh-skin-light) !important;
+    font-weight: 600;
+    font-size: 1rem !important;
+}
+
+/* Contact Block */
+.contact-block {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: var(--lh-bg-card);
+    border: 1px solid var(--lh-border-subtle);
+    margin: 1rem 0;
+}
+
+.contact-block p {
+    margin-bottom: 0.3rem;
+}
+
+.contact-block strong {
+    color: var(--lh-text);
+}
+
+/* Contact Details */
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.contact-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    border-radius: 14px;
+    background: var(--lh-bg-card);
+    border: 1px solid var(--lh-border-subtle);
+}
+
+.contact-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.contact-item strong {
+    color: var(--lh-text);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.contact-item p {
+    margin: 0;
+    font-size: 0.92rem;
+}
+
+.legal-link {
+    color: var(--lh-skin-light) !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Table */
+.legal-table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.legal-page table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.legal-page th {
+    background: rgba(232, 0, 29, 0.1);
+    color: var(--lh-text);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--lh-border);
+}
+
+.legal-page td {
+    padding: 0.75rem 1rem;
+    color: var(--lh-text-muted);
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--lh-border-subtle);
+}
+
+.legal-page tr:last-child td {
+    border-bottom: none;
+}
+
+.legal-page tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Ordered list for Safety page */
+.legal-page ol.legal-ordered {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 1rem;
+    counter-reset: step;
+}
+
+.legal-page ol.legal-ordered>li {
+    counter-increment: step;
+    padding-left: 2rem;
+}
+
+.legal-page ol.legal-ordered>li::before {
+    content: counter(step) '.';
+    font-weight: 700;
+    color: var(--lh-red);
+    font-size: 0.9rem;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    opacity: 1;
+}
+
+.legal-page ol.legal-ordered>li ul {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .legal-page {
+        padding: 100px 20px 60px;
+    }
+}

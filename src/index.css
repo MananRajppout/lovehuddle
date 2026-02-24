@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+:root {
+  /* === LoveHuddle Brand Palette (from logo) === */
+  --lh-red: #E8001D;
+  --lh-red-dark: #B8001A;
+  --lh-red-light: #FF2040;
+  --lh-red-glow: rgba(232, 0, 29, 0.35);
+
+  /* Skin tones from the logo hands */
+  --lh-skin-light: #E8C49A;
+  --lh-skin-mid: #D4956A;
+  --lh-skin-dark: #8B5E3C;
+
+  /* Backgrounds */
+  --lh-bg: #0D0A0B;
+  --lh-bg-2: #130D0F;
+  --lh-bg-card: rgba(255, 255, 255, 0.03);
+  --lh-bg-card-hover: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --lh-text: #FDF6F0;
+  --lh-text-muted: rgba(253, 246, 240, 0.55);
+  --lh-text-accent: var(--lh-skin-light);
+
+  /* Borders & Glass */
+  --lh-border: rgba(232, 0, 29, 0.15);
+  --lh-border-subtle: rgba(255, 255, 255, 0.08);
+  --lh-glass: rgba(255, 255, 255, 0.04);
+  --lh-glass-border: rgba(255, 255, 255, 0.09);
+
+  /* Gradients */
+  --lh-gradient: linear-gradient(135deg, var(--lh-red) 0%, #FF6B6B 100%);
+  --lh-gradient-warm: linear-gradient(135deg, var(--lh-red) 0%, var(--lh-skin-mid) 100%);
+  --lh-gradient-text: linear-gradient(135deg, var(--lh-red-light) 0%, var(--lh-skin-light) 100%);
+  --lh-gradient-bg: linear-gradient(180deg, #0D0A0B 0%, #1A0810 50%, #0D0A0B 100%);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--lh-bg);
+  background-image: var(--lh-gradient-bg);
+  color: var(--lh-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Glass morphism utility */
+.glass {
+  background: var(--lh-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--lh-glass-border);
+}
+
+/* Gradient text — using red→skin */
+.gradient-text {
+  background: var(--lh-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+/* Ambient orb background decorations */
+body::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(232, 0, 29, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 149, 106, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.9s ease forwards;
+}

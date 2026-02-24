@@ -36,15 +36,16 @@ function RevealSection({ children, className = '', ...props }) {
 }
 
 /* ─── Landing Page Component ─── */
-function Landing({ blogPosts, activeBlog, setActiveBlog }) {
+function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
 
   const handleJoin = (e) => {
     e.preventDefault();
     if (email) {
+      onJoinWaitlist(email);
       setJoined(true);
-      console.log('Joined with:', email);
+      setEmail('');
     }
   };
 
@@ -216,6 +217,12 @@ function Landing({ blogPosts, activeBlog, setActiveBlog }) {
 
 /* ─── Main App with Router ─── */
 function App() {
+  const [waitlist, setWaitlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lh_waitlist')) || [];
+    } catch { return []; }
+  });
+
   const [activeBlog, setActiveBlog] = useState(null);
 
   const [blogPosts, setBlogPosts] = useState([
@@ -299,6 +306,13 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
     }
   ]);
 
+  const addToWaitlist = (email) => {
+    const entry = { email, date: new Date().toLocaleString('en-GB') };
+    const updated = [entry, ...waitlist];
+    setWaitlist(updated);
+    localStorage.setItem('lh_waitlist', JSON.stringify(updated));
+  };
+
   const addPost = (newPost) => {
     setBlogPosts([newPost, ...blogPosts]);
   };
@@ -323,8 +337,8 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
       </nav>
 
       <Routes>
-        <Route path="/" element={<Landing blogPosts={blogPosts} activeBlog={activeBlog} setActiveBlog={setActiveBlog} />} />
-        <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onDeletePost={deletePost} />} />
+        <Route path="/" element={<Landing blogPosts={blogPosts} activeBlog={activeBlog} setActiveBlog={setActiveBlog} onJoinWaitlist={addToWaitlist} />} />
+        <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onDeletePost={deletePost} waitlist={waitlist} />} />
       </Routes>
     </div>
   );

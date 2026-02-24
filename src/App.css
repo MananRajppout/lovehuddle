@@ -36,12 +36,10 @@
 }
 
 .logo {
-  height: 48px;
+  height: 80px;
   object-fit: contain;
   transition: opacity 0.2s;
-  border-radius: 6px;
-  background: white;
-  padding: 4px 8px;
+  mix-blend-mode: screen;
 }
 
 .logo:hover {
@@ -790,12 +788,10 @@
 }
 
 .footer-logo {
-  height: 52px;
+  height: 80px;
   object-fit: contain;
   width: fit-content;
-  border-radius: 6px;
-  background: white;
-  padding: 4px 8px;
+  mix-blend-mode: screen;
 }
 
 .footer-tagline {

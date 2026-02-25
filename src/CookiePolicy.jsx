@@ -96,6 +96,7 @@ function CookiePolicy() {
                 <div className="contact-block">
                     <p><strong>Kevin Peddie</strong> – Founder &amp; Director</p>
                     <p>19 Penrhiwtyn Street, Neath, South Wales, SA11 2HG, UK</p>
+                    <p><a href="mailto:hello@lovehuddle.com" className="legal-link">hello@lovehuddle.com</a></p>
                 </div>
             </section>
         </div>

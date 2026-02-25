@@ -16,6 +16,7 @@ function Contact() {
                 <div className="contact-block">
                     <p><strong>Kevin Peddie</strong></p>
                     <p>Founder and Director, LoveHuddle Ltd</p>
+                    <p><a href="mailto:hello@lovehuddle.com" className="legal-link">hello@lovehuddle.com</a></p>
                 </div>
 
                 <div className="contact-details">

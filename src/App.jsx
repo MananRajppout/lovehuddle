@@ -152,7 +152,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
-                  <h3>2025: Blueprinting</h3>
+                  <h3>2025: Blueprint</h3>
                   <p>A full year of strategy, UX, and architectural design completed. Ready for the future.</p>
                 </div>
               </div>

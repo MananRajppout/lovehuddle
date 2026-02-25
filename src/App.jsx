@@ -115,7 +115,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
             <div className="feature-card">
               <div className="feature-icon">🛡️</div>
               <h3>Bot-Free</h3>
-              <p>One-time verification ensures a community of real humans. First 500 are FREE.</p>
+              <p>A one‑time small £4 verification fee ensures safety and a community of real humans. First 500 are FREE.</p>
             </div>
           </div>
         </RevealSection>

@@ -36,7 +36,7 @@
 }
 
 .logo {
-  height: 80px;
+  height: 110px;
   object-fit: contain;
   transition: opacity 0.2s;
   mix-blend-mode: screen;
@@ -355,7 +355,7 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
@@ -788,7 +788,7 @@
 }
 
 .footer-logo {
-  height: 80px;
+  height: 110px;
   object-fit: contain;
   width: fit-content;
   mix-blend-mode: screen;
@@ -980,6 +980,14 @@
 
   .features-grid {
     grid-template-columns: 1fr;
+  }
+
+  .logo {
+    height: 80px;
+  }
+
+  .footer-logo {
+    height: 80px;
   }
 
   .offer-box {

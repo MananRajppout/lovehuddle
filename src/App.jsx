@@ -63,6 +63,28 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
     }
   };
 
+  /* ── Open blog: push a history entry so Back closes the modal ── */
+  const openBlog = (post) => {
+    setActiveBlog(post);
+    window.history.pushState({ blog: true }, '');
+  };
+
+  /* ── Close blog: go back in history to pop the entry we pushed ── */
+  const closeBlog = () => {
+    if (activeBlog) {
+      window.history.back();   // triggers popstate → clears activeBlog
+    }
+  };
+
+  /* ── Listen for browser Back button to close the modal ── */
+  useEffect(() => {
+    const onPopState = () => {
+      setActiveBlog(null);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [setActiveBlog]);
+
   return (
     <>
       {/* Hero Section */}
@@ -159,7 +181,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
           <h2 className="section-title">LoveHuddle <span className="gradient-text">Articles</span></h2>
           <div className="articles-grid">
             {blogPosts.map((post, i) => (
-              <div key={post.id} className="article-card" style={{ animationDelay: `${i * 0.1}s` }} onClick={() => setActiveBlog(post)}>
+              <div key={post.id} className="article-card" style={{ animationDelay: `${i * 0.1}s` }} onClick={() => openBlog(post)}>
                 <div className="article-date">{post.date}</div>
                 <h3>{post.title}</h3>
                 <p>{post.excerpt}</p>
@@ -192,9 +214,9 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
 
       {/* Blog Modal */}
       {activeBlog && (
-        <div className="modal-overlay" onClick={() => setActiveBlog(null)}>
+        <div className="modal-overlay" onClick={closeBlog}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setActiveBlog(null)}>&times;</button>
+            <button className="close-btn" onClick={closeBlog}>&times;</button>
             <div className="article-date">{activeBlog.date}</div>
             <h2>{activeBlog.title}</h2>
             <div className="article-body">

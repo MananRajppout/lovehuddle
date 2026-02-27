@@ -231,22 +231,13 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
   );
 }
 
-/* ─── Main App with Router ─── */
-function App() {
-  const [waitlist, setWaitlist] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('lh_waitlist')) || [];
-    } catch { return []; }
-  });
-
-  const [activeBlog, setActiveBlog] = useState(null);
-
-  const [blogPosts, setBlogPosts] = useState([
-    {
-      id: 0,
-      title: "Why I'm Building a Dating Platform Without Swiping or Paywalls",
-      excerpt: "Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional.",
-      content: `Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional. Swipe left, swipe right, repeat. Paywalls everywhere. Matches that go nowhere. Conversations that never start. It's a system built for speed, not for people.
+/* ─── Default blog posts ─── */
+const DEFAULT_BLOG_POSTS = [
+  {
+    id: 0,
+    title: "Why I'm Building a Dating Platform Without Swiping or Paywalls",
+    excerpt: "Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional.",
+    content: `Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional. Swipe left, swipe right, repeat. Paywalls everywhere. Matches that go nowhere. Conversations that never start. It's a system built for speed, not for people.
 
 Living here in Wales, I've seen the same frustration that many adults across the UK feel: dating apps have become exhausting. They push you to scroll, judge quickly, and move on even faster. They're designed to keep you hooked, not to help you meet someone meaningful.
 
@@ -273,13 +264,13 @@ LoveHuddle is built for adults who want something real — people who are tired 
 This platform is being built intentionally, step by step, with a simple mission: Create a space where adults can connect without being rushed, pushed, or sold to.
 
 If that resonates with you, you're in the right place. LoveHuddle is for people who want connection that feels human again — and this is just the beginning.`,
-      date: "Feb 24, 2026"
-    },
-    {
-      id: 1,
-      title: "The Death of the Algorithm",
-      excerpt: "Why swiping is killing human connection and how we're fixing it.",
-      content: `For too long, our social lives have been dictated by algorithms designed to keep us scrolling rather than meeting. LoveHuddle is stripping away the digital barriers to bring back genuine human moments.
+    date: "Feb 24, 2026"
+  },
+  {
+    id: 1,
+    title: "The Death of the Algorithm",
+    excerpt: "Why swiping is killing human connection and how we're fixing it.",
+    content: `For too long, our social lives have been dictated by algorithms designed to keep us scrolling rather than meeting. LoveHuddle is stripping away the digital barriers to bring back genuine human moments.
 
 The dating industry has become a machine — one that profits from loneliness, not from love. Every time you swipe, you feed the algorithm. Every paywall you encounter is designed to exploit your desire for connection.
 
@@ -288,13 +279,13 @@ We believe that meaningful relationships start with meaningful conversations. No
 LoveHuddle's approach is fundamentally different. We're building technology that gets out of the way — that facilitates real human interaction rather than replacing it with an addictive digital substitute.
 
 Stay tuned for more updates as we approach the build phase in March 2026.`,
-      date: "Feb 24, 2026"
-    },
-    {
-      id: 2,
-      title: "Built in Wales, for the UK",
-      excerpt: "The journey of a solo founder disrupting Silicon Valley.",
-      content: `Tech doesn't just belong to big corporations in California. LoveHuddle is architected in Wales, built with the UK community at its heart. We believe in ethical, local impact over distant profit.
+    date: "Feb 24, 2026"
+  },
+  {
+    id: 2,
+    title: "Built in Wales, for the UK",
+    excerpt: "The journey of a solo founder disrupting Silicon Valley.",
+    content: `Tech doesn't just belong to big corporations in California. LoveHuddle is architected in Wales, built with the UK community at its heart. We believe in ethical, local impact over distant profit.
 
 The UK dating scene deserves better than recycled Silicon Valley products. We deserve platforms that understand our culture, our values, and our way of life.
 
@@ -303,13 +294,13 @@ As a solo founder based in Wales, I've seen firsthand how technology can either 
 Every design decision, every feature, every policy is made with one question in mind: does this help real people make real connections?
 
 Stay tuned for more updates as we approach the build phase in March 2026.`,
-      date: "Feb 20, 2026"
-    },
-    {
-      id: 3,
-      title: "The Summer 2026 Vision",
-      excerpt: "What to expect when we launch nationally.",
-      content: `Launching a platform without paywalls is a bold move. Here is the roadmap for how we will reach every corner of the UK by Summer 2026, ensuring safety and authenticity with every connection.
+    date: "Feb 20, 2026"
+  },
+  {
+    id: 3,
+    title: "The Summer 2026 Vision",
+    excerpt: "What to expect when we launch nationally.",
+    content: `Launching a platform without paywalls is a bold move. Here is the roadmap for how we will reach every corner of the UK by Summer 2026, ensuring safety and authenticity with every connection.
 
 Our vision is simple but ambitious: create the UK's most trusted, most human dating platform — one that puts people before profit.
 
@@ -318,9 +309,32 @@ Phase 1 is our closed beta, where our founding 500 members will shape the platfo
 At every stage, safety comes first. Our one-time verification process ensures that every person on LoveHuddle is exactly who they say they are.
 
 Stay tuned for more updates as we approach the build phase in March 2026.`,
-      date: "Feb 15, 2026"
-    }
-  ]);
+    date: "Feb 15, 2026"
+  }
+];
+
+/* ─── Main App with Router ─── */
+function App() {
+  const [waitlist, setWaitlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lh_waitlist')) || [];
+    } catch { return []; }
+  });
+
+  const [activeBlog, setActiveBlog] = useState(null);
+
+  const [blogPosts, setBlogPosts] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('lh_blog_posts'));
+      if (stored && stored.length > 0) return stored;
+    } catch { /* use defaults */ }
+    return DEFAULT_BLOG_POSTS;
+  });
+
+  /* ── Persist blog posts whenever they change ── */
+  useEffect(() => {
+    localStorage.setItem('lh_blog_posts', JSON.stringify(blogPosts));
+  }, [blogPosts]);
 
   const addToWaitlist = (email) => {
     const entry = { email, date: new Date().toLocaleString('en-GB') };
@@ -330,32 +344,41 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
   };
 
   const addPost = (newPost) => {
-    setBlogPosts([newPost, ...blogPosts]);
+    setBlogPosts(prev => [newPost, ...prev]);
+  };
+
+  const editPost = (updatedPost) => {
+    setBlogPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
   };
 
   const deletePost = (id) => {
-    setBlogPosts(blogPosts.filter(p => p.id !== id));
+    setBlogPosts(prev => prev.filter(p => p.id !== id));
   };
+
+  const location = useLocation();
+  const isAdmin = location.pathname === '/admin';
 
   return (
     <div className="app">
-      {/* Navbar */}
-      <nav className="navbar">
-        <div className="nav-content">
-          <Link to="/"><img src={logo} alt="LoveHuddle" className="logo" /></Link>
-          <div className="nav-links">
-            <a href="/#disruption">The Disruption</a>
-            <a href="/#roadmap">The Roadmap</a>
-            <a href="/#articles">Articles</a>
-            <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
+      {/* Navbar — hidden on admin */}
+      {!isAdmin && (
+        <nav className="navbar">
+          <div className="nav-content">
+            <Link to="/"><img src={logo} alt="LoveHuddle" className="logo" /></Link>
+            <div className="nav-links">
+              <a href="/#disruption">The Disruption</a>
+              <a href="/#roadmap">The Roadmap</a>
+              <a href="/#articles">Articles</a>
+              <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Landing blogPosts={blogPosts} activeBlog={activeBlog} setActiveBlog={setActiveBlog} onJoinWaitlist={addToWaitlist} />} />
-        <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onDeletePost={deletePost} waitlist={waitlist} />} />
+        <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onEditPost={editPost} onDeletePost={deletePost} waitlist={waitlist} />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/safety" element={<Safety />} />
@@ -363,34 +386,36 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
         <Route path="/contact" element={<Contact />} />
       </Routes>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            <img src={logo} alt="LoveHuddle" className="footer-logo" />
-            <p className="footer-tagline">A calmer, more human way to meet people.</p>
+      {/* Footer — hidden on admin */}
+      {!isAdmin && (
+        <footer className="footer">
+          <div className="footer-inner">
+            <div className="footer-brand">
+              <img src={logo} alt="LoveHuddle" className="footer-logo" />
+              <p className="footer-tagline">A calmer, more human way to meet people.</p>
+            </div>
+            <div className="footer-col">
+              <h4>Platform</h4>
+              <Link to="/#disruption">The Disruption</Link>
+              <Link to="/#roadmap">The Roadmap</Link>
+              <Link to="/#articles">Articles</Link>
+            </div>
+            <div className="footer-col">
+              <h4>Legal &amp; Info</h4>
+              <Link to="/privacy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
+              <Link to="/safety">Safety &amp; Support</Link>
+              <Link to="/cookies">Cookie Policy</Link>
+              <Link to="/contact">Contact Us</Link>
+            </div>
           </div>
-          <div className="footer-col">
-            <h4>Platform</h4>
-            <Link to="/#disruption">The Disruption</Link>
-            <Link to="/#roadmap">The Roadmap</Link>
-            <Link to="/#articles">Articles</Link>
+          <div className="footer-divider"></div>
+          <div className="footer-bottom-bar">
+            <p>© 2026 LoveHuddle Ltd. All Rights Reserved.</p>
+            <p className="footer-legal-small">Registered in England &amp; Wales | Company No: 16971133 | LoveHuddle™ is a trademark of LoveHuddle Ltd.</p>
           </div>
-          <div className="footer-col">
-            <h4>Legal &amp; Info</h4>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
-            <Link to="/safety">Safety &amp; Support</Link>
-            <Link to="/cookies">Cookie Policy</Link>
-            <Link to="/contact">Contact Us</Link>
-          </div>
-        </div>
-        <div className="footer-divider"></div>
-        <div className="footer-bottom-bar">
-          <p>© 2026 LoveHuddle Ltd. All Rights Reserved.</p>
-          <p className="footer-legal-small">Registered in England &amp; Wales | Company No: 16971133 | LoveHuddle™ is a trademark of LoveHuddle Ltd.</p>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

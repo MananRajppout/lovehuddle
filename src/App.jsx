@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from './supabaseClient';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import logo from './assets/images/logo.png';
@@ -315,44 +316,95 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
 
 /* ─── Main App with Router ─── */
 function App() {
-  const [waitlist, setWaitlist] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('lh_waitlist')) || [];
-    } catch { return []; }
-  });
-
+  const [waitlist, setWaitlist] = useState([]);
   const [activeBlog, setActiveBlog] = useState(null);
+  const [blogPosts, setBlogPosts] = useState(DEFAULT_BLOG_POSTS);
 
-  const [blogPosts, setBlogPosts] = useState(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('lh_blog_posts'));
-      if (stored && stored.length > 0) return stored;
-    } catch { /* use defaults */ }
-    return DEFAULT_BLOG_POSTS;
-  });
-
-  /* ── Persist blog posts whenever they change ── */
+  /* ── Fetch blog posts from Supabase on mount ── */
   useEffect(() => {
-    localStorage.setItem('lh_blog_posts', JSON.stringify(blogPosts));
-  }, [blogPosts]);
+    const fetchPosts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) setBlogPosts(data);
+      } catch (err) {
+        console.log('Using default posts (Supabase unavailable)');
+      }
+    };
+    fetchPosts();
+  }, []);
 
-  const addToWaitlist = (email) => {
+  /* ── Fetch waitlist from Supabase on mount ── */
+  useEffect(() => {
+    const fetchWaitlist = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('waitlist_entries')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) setWaitlist(data);
+      } catch (err) {
+        console.log('Waitlist fetch skipped (Supabase unavailable)');
+      }
+    };
+    fetchWaitlist();
+  }, []);
+
+  const addToWaitlist = async (email) => {
     const entry = { email, date: new Date().toLocaleString('en-GB') };
-    const updated = [entry, ...waitlist];
-    setWaitlist(updated);
-    localStorage.setItem('lh_waitlist', JSON.stringify(updated));
+    try {
+      await supabase.from('waitlist_entries').insert([entry]);
+      setWaitlist(prev => [entry, ...prev]);
+    } catch (err) {
+      console.error('Failed to add to waitlist:', err);
+    }
   };
 
-  const addPost = (newPost) => {
-    setBlogPosts(prev => [newPost, ...prev]);
+  const addPost = async (newPost) => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .insert([{
+          title: newPost.title,
+          excerpt: newPost.excerpt,
+          content: newPost.content,
+          date: newPost.date
+        }])
+        .select()
+        .single();
+      if (!error && data) setBlogPosts(prev => [data, ...prev]);
+    } catch (err) {
+      console.error('Failed to add post:', err);
+    }
   };
 
-  const editPost = (updatedPost) => {
-    setBlogPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+  const editPost = async (updatedPost) => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .update({
+          title: updatedPost.title,
+          excerpt: updatedPost.excerpt,
+          content: updatedPost.content
+        })
+        .eq('id', updatedPost.id)
+        .select()
+        .single();
+      if (!error && data) setBlogPosts(prev => prev.map(p => p.id === data.id ? data : p));
+    } catch (err) {
+      console.error('Failed to edit post:', err);
+    }
   };
 
-  const deletePost = (id) => {
-    setBlogPosts(prev => prev.filter(p => p.id !== id));
+  const deletePost = async (id) => {
+    try {
+      await supabase.from('blog_posts').delete().eq('id', id);
+      setBlogPosts(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+    }
   };
 
   const location = useLocation();

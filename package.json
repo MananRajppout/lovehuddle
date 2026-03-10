@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup-db": "node scripts/setup-db.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.13.1"
@@ -17,6 +19,8 @@
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
+    "dotenv": "^17.3.1",
+    "pg": "^8.20.0",
     "vite": "^4.1.0"
   }
 }

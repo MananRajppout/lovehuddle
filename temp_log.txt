@@ -1,0 +1,25 @@
+﻿[dotenv@17.3.1] injecting env (3) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+Connecting to Supabase database...
+node : Ô£ù Setup 
+failed: getaddrinfo 
+ENOTFOUND db.fvkbtvzqv
+qayzncibjic.supabase.c
+o
+At line:1 char:1
++ node 
+scripts/setup-db.js 
+2>&1 | Out-File 
+-FilePath 
+temp_log.txt -Enco ...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (Ô£ù Setup    
+ faile...jic.supab    
+ase.co:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 

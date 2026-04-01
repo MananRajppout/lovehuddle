@@ -27,6 +27,13 @@ function Contact() {
                             <p>19 Penrhiwtyn Street<br />Neath, South Wales<br />SA11 2HG, UK</p>
                         </div>
                     </div>
+                    <div className="contact-item">
+                        <span className="contact-icon">📞</span>
+                        <div>
+                            <strong>Phone</strong>
+                            <p><a href="tel:07907551655" className="legal-link">07907 551 655</a></p>
+                        </div>
+                    </div>
                 </div>
             </section>
 

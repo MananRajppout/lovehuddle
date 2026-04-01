@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './supabaseClient';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import logo from './assets/images/logo.png';
 import heroBg from './assets/images/hero-bg.png';
+import finalistBadge from './assets/images/badge.jpeg';
 import Admin from './Admin';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
@@ -46,6 +47,54 @@ function RevealSection({ children, className = '', ...props }) {
   return (
     <div ref={ref} className={`reveal ${className}`} {...props}>
       {children}
+    </div>
+  );
+}
+
+/* ─── Countdown Component ─── */
+const LAUNCH_DATE = new Date('2026-04-08T16:10:19+05:00');
+
+function Countdown() {
+  const calcTime = useCallback(() => {
+    const diff = LAUNCH_DATE - Date.now();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    return {
+      days: Math.floor(diff / 86400000),
+      hours: Math.floor((diff % 86400000) / 3600000),
+      minutes: Math.floor((diff % 3600000) / 60000),
+      seconds: Math.floor((diff % 60000) / 1000),
+    };
+  }, []);
+
+  const [time, setTime] = useState(calcTime);
+
+  useEffect(() => {
+    const id = setInterval(() => setTime(calcTime()), 1000);
+    return () => clearInterval(id);
+  }, [calcTime]);
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return (
+    <div className="countdown-wrapper">
+      <p className="countdown-label">✦ Something New is Happening ✦</p>
+      <div className="countdown-blocks">
+        {[
+          { value: pad(time.days), unit: 'Days' },
+          { value: pad(time.hours), unit: 'Hours' },
+          { value: pad(time.minutes), unit: 'Minutes' },
+          { value: pad(time.seconds), unit: 'Seconds' },
+        ].map(({ value, unit }, i) => (
+          <React.Fragment key={unit}>
+            <div className="countdown-block">
+              <span className="countdown-num">{value}</span>
+              <span className="countdown-unit">{unit}</span>
+            </div>
+            {i < 3 && <span className="countdown-sep">:</span>}
+          </React.Fragment>
+        ))}
+      </div>
+      <p className="countdown-sub">Get Ready For a New Way to Connect</p>
     </div>
   );
 }
@@ -110,10 +159,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
             <button type="submit" className="btn-primary">Join Waiting List</button>
           </form>
           {joined && <p className="success-msg">✓ Welcome to the inner circle. Stay tuned.</p>}
-        </div>
-        <div className="hero-scroll-hint">
-          <span>Discover More</span>
-          <div className="scroll-arrow"></div>
+          <Countdown />
         </div>
       </header>
 
@@ -169,6 +215,58 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
                 <div className="timeline-content">
                   <h3>Summer 2026: National Rollout</h3>
                   <p>The dawn of a new era. LoveHuddle launches across the UK.</p>
+                </div>
+              </div>
+            </div>
+          </RevealSection>
+        </div>
+      </section>
+
+      {/* Achievements Section */}
+      <section id="achievements" className="achievements-section">
+        <div className="section-container">
+          <RevealSection>
+            <div className="achievements-inner">
+              <div className="achievements-badge-col">
+                <a
+                  href="https://walesstartupwards.wales"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="achievements-badge-link"
+                >
+                  <div className="achievements-badge-ring">
+                    <img src={finalistBadge} alt="Wales StartUp Awards 2026 Finalist" className="achievements-badge-img" />
+                  </div>
+                </a>
+                <span className="achievements-badge-caption">Wales StartUp Awards 2026</span>
+              </div>
+              <div className="achievements-copy">
+                <p className="achievements-eyebrow">✨ Our Achievements</p>
+                <h2 className="achievements-headline">
+                  Named a Finalist <span className="gradient-text">Before a Single Line of Code Was Written</span>
+                </h2>
+                <p className="achievements-desc">
+                  In early 2026, before development had even commenced, LoveHuddle was officially announced as a <strong>Finalist</strong> for the prestigious <strong>Wales StartUp Awards 2026</strong> in the highly competitive <strong>Innovative StartUp of the Year</strong> category.
+                </p>
+                <p className="achievements-desc">
+                  This early recognition is a powerful testament to our core philosophy: a bold idea, visionary architecture, and an unwavering commitment to disrupting the status quo can resonate profoundly—even before the platform launches. It proves the industry is hungry for a revolution in human connection.
+                </p>
+                <p className="achievements-desc">
+                  <strong>Built solo. Born in Wales. Already turning heads.</strong>
+                </p>
+                <div className="achievements-stats">
+                  <div className="achievement-stat">
+                    <span className="achievement-stat-num">2026</span>
+                    <span className="achievement-stat-label">Shortlist Year</span>
+                  </div>
+                  <div className="achievement-stat">
+                    <span className="achievement-stat-num">#1</span>
+                    <span className="achievement-stat-label">Solo Founder</span>
+                  </div>
+                  <div className="achievement-stat">
+                    <span className="achievement-stat-num">Wales</span>
+                    <span className="achievement-stat-label">Born &amp; Built</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -268,7 +366,44 @@ If that resonates with you, you're in the right place. LoveHuddle is for people 
     date: "Feb 24, 2026"
   },
   {
-    id: 1,
+    id: 4,
+    title: "Shortlisted Before Launch: LoveHuddle Makes the Wales StartUp Awards 2026",
+    excerpt: "Before a single line of code was written, LoveHuddle was officially shortlisted for Innovative StartUp of the Year at the Wales StartUp Awards 2026.",
+    content: `There's a moment every founder dreams about — the moment someone outside your own head believes in what you're building.
+
+For LoveHuddle, that moment came early. Before our platform was built. Before our app existed. Before we had even written a single line of production code.
+
+In early 2026, LoveHuddle was officially shortlisted for the Wales StartUp Awards 2026 in the category of Innovative StartUp of the Year.
+
+Let that sink in for a moment.
+
+A solo-founded startup, conceived and built in South Wales, was recognised on a national stage — not because of millions in funding or a team of fifty engineers — but because of an idea. A vision. A refusal to accept that the dating app industry couldn't be done better.
+
+What does this mean?
+
+This shortlisting is more than an award nomination. It's validation. It tells us that the world is ready for something different. That people — judges, industry professionals, entrepreneurs — can see the gap in the market that we've been talking about.
+
+Dating apps have been broken for years. Swipe culture, paywalls, bots, fake profiles, endless subscriptions. LoveHuddle set out to tear all of that down and replace it with something genuinely human.
+
+And before we even launched, the Welsh startup community agreed.
+
+Why Wales?
+
+Wales often gets overlooked in the UK tech conversation. The spotlight usually falls on London, Manchester, or Edinburgh. But some of the most innovative thinking in the UK is happening right here — in communities that understand people, that value authenticity, and that build things that matter.
+
+LoveHuddle was always going to be built here. Not because of circumstance, but by design. We believe that the future of tech doesn't belong to Silicon Valley. It belongs to communities. And this shortlisting proves that Welsh innovation can compete on any stage.
+
+What's next?
+
+We're now in active development. The platform is being built. The waitlist is growing. Summer 2026 is the target.
+
+This shortlisting lights a fire under everything we're doing. It's a reminder that the idea was always worth fighting for — and now, it's time to build it.
+
+If you haven't joined the waiting list yet, now is the time. Be part of something that was recognised as innovative before it even launched.`,
+    date: "Apr 1, 2026"
+  },
+  {
+    id: 0,
     title: "The Death of the Algorithm",
     excerpt: "Why swiping is killing human connection and how we're fixing it.",
     content: `For too long, our social lives have been dictated by algorithms designed to keep us scrolling rather than meeting. LoveHuddle is stripping away the digital barriers to bring back genuine human moments.
@@ -420,6 +555,7 @@ function App() {
             <div className="nav-links">
               <a href="/#disruption">The Disruption</a>
               <a href="/#roadmap">The Roadmap</a>
+              <a href="/#achievements">Achievements</a>
               <a href="/#articles">Articles</a>
               <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
             </div>

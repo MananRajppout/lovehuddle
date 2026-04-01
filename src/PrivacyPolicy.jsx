@@ -17,6 +17,7 @@ function PrivacyPolicy() {
                     <p><strong>Contact:</strong></p>
                     <p>Kevin Peddie (Founder and Director)</p>
                     <p>19 Penrhiwtyn Street, Neath, South Wales, SA11 2HG, UK</p>
+                    <p><a href="tel:07907551655" className="legal-link">07907 551 655</a></p>
                     <p><a href="mailto:hello@lovehuddle.com" className="legal-link">hello@lovehuddle.com</a></p>
                 </div>
             </section>
@@ -165,6 +166,7 @@ function PrivacyPolicy() {
                     <p><strong>Kevin Peddie</strong></p>
                     <p>Founder and Director, LoveHuddle Ltd</p>
                     <p>19 Penrhiwtyn Street, Neath, South Wales, SA11 2HG, UK</p>
+                    <p><a href="tel:07907551655" className="legal-link">07907 551 655</a></p>
                     <p><a href="mailto:hello@lovehuddle.com" className="legal-link">hello@lovehuddle.com</a></p>
                 </div>
             </section>

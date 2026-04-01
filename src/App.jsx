@@ -77,7 +77,7 @@ function Countdown() {
 
   return (
     <div className="countdown-wrapper">
-      <p className="countdown-label">✦ Something New is Happening ✦</p>
+      <p className="countdown-label">✦ A New Chapter Begins ✦</p>
       <div className="countdown-blocks">
         {[
           { value: pad(time.days), unit: 'Days' },
@@ -94,7 +94,7 @@ function Countdown() {
           </React.Fragment>
         ))}
       </div>
-      <p className="countdown-sub">Get Ready For a New Way to Connect</p>
+      <p className="countdown-sub">The Active Build Phase Commences Soon</p>
     </div>
   );
 }
@@ -252,7 +252,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
                   This early recognition is a powerful testament to our core philosophy: a bold idea, visionary architecture, and an unwavering commitment to disrupting the status quo can resonate profoundly—even before the platform launches. It proves the industry is hungry for a revolution in human connection.
                 </p>
                 <p className="achievements-desc">
-                  <strong>Built solo. Born in Wales. Already turning heads.</strong>
+                  <strong>Built solo. Created in Wales. Already turning heads.</strong>
                 </p>
                 <div className="achievements-stats">
                   <div className="achievement-stat">
@@ -265,7 +265,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
                   </div>
                   <div className="achievement-stat">
                     <span className="achievement-stat-num">Wales</span>
-                    <span className="achievement-stat-label">Born &amp; Built</span>
+                    <span className="achievement-stat-label">Created &amp; Built</span>
                   </div>
                 </div>
               </div>

@@ -52,7 +52,7 @@ function RevealSection({ children, className = '', ...props }) {
 }
 
 /* ─── Countdown Component ─── */
-const LAUNCH_DATE = new Date('2026-04-08T16:10:19+05:00');
+const LAUNCH_DATE = new Date('2026-04-11T11:35:15+05:00');
 
 function Countdown() {
   const calcTime = useCallback(() => {
@@ -144,7 +144,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content animate-fade-in">
-          <div className="hero-eyebrow">Beta Launching Summer 2026</div>
+          <div className="hero-eyebrow">Beta Launching Late Summer Launch 2026</div>
           <h1 className="hero-title">The End of the <span className="gradient-text">Swipe Era</span>.</h1>
           <p className="hero-subtitle">No Paywalls. No Pressure. Just People.</p>
           <p className="hero-tagline">A New Kind of Hybrid Connection Platform.</p>
@@ -213,7 +213,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <div className="timeline-content">
-                  <h3>Summer 2026: National Rollout</h3>
+                  <h3>Late Summer Launch 2026: National Rollout</h3>
                   <p>The dawn of a new era. LoveHuddle launches across the UK.</p>
                 </div>
               </div>
@@ -395,7 +395,7 @@ LoveHuddle was always going to be built here. Not because of circumstance, but b
 
 What's next?
 
-We're now in active development. The platform is being built. The waitlist is growing. Summer 2026 is the target.
+We're now in active development. The platform is being built. The waitlist is growing. Late Summer Launch 2026 is the target.
 
 This shortlisting lights a fire under everything we're doing. It's a reminder that the idea was always worth fighting for — and now, it's time to build it.
 
@@ -434,9 +434,9 @@ Stay tuned for more updates as we approach the build phase in March 2026.`,
   },
   {
     id: 3,
-    title: "The Summer 2026 Vision",
+    title: "The Late Summer Launch 2026 Vision",
     excerpt: "What to expect when we launch nationally.",
-    content: `Launching a platform without paywalls is a bold move. Here is the roadmap for how we will reach every corner of the UK by Summer 2026, ensuring safety and authenticity with every connection.
+    content: `Launching a platform without paywalls is a bold move. Here is the roadmap for how we will reach every corner of the UK by Late Summer Launch 2026, ensuring safety and authenticity with every connection.
 
 Our vision is simple but ambitious: create the UK's most trusted, most human dating platform — one that puts people before profit.
 

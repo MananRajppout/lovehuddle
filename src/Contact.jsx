@@ -40,7 +40,7 @@ function Contact() {
             <section>
                 <h2>About LoveHuddle</h2>
                 <p>LoveHuddle is a solo‑founded, UK‑based dating platform being built in Wales. We're creating a calmer, more human alternative to the existing dating apps — no swiping, no paywalls, just real connection.</p>
-                <p>We're currently in the build phase ahead of our Summer 2026 national launch. Join the waiting list on our <Link to="/" className="legal-link">homepage</Link> to be among the first to experience LoveHuddle.</p>
+                <p>We're currently in the build phase ahead of our Late Summer Launch 2026 national launch. Join the waiting list on our <Link to="/" className="legal-link">homepage</Link> to be among the first to experience LoveHuddle.</p>
             </section>
         </div>
     );

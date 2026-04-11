@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabaseClient';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
@@ -51,50 +51,68 @@ function RevealSection({ children, className = '', ...props }) {
   );
 }
 
-/* ─── Countdown Component ─── */
-const LAUNCH_DATE = new Date('2026-04-11T11:35:15+05:00');
-
-function Countdown() {
-  const calcTime = useCallback(() => {
-    const diff = LAUNCH_DATE - Date.now();
-    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    return {
-      days: Math.floor(diff / 86400000),
-      hours: Math.floor((diff % 86400000) / 3600000),
-      minutes: Math.floor((diff % 3600000) / 60000),
-      seconds: Math.floor((diff % 60000) / 1000),
-    };
-  }, []);
-
-  const [time, setTime] = useState(calcTime);
-
-  useEffect(() => {
-    const id = setInterval(() => setTime(calcTime()), 1000);
-    return () => clearInterval(id);
-  }, [calcTime]);
-
-  const pad = (n) => String(n).padStart(2, '0');
-
+/* ─── Launch Announcement ─── */
+function LaunchAnnounce() {
+  const ref = useReveal();
   return (
-    <div className="countdown-wrapper">
-      <p className="countdown-label">✦ A New Chapter Begins ✦</p>
-      <div className="countdown-blocks">
-        {[
-          { value: pad(time.days), unit: 'Days' },
-          { value: pad(time.hours), unit: 'Hours' },
-          { value: pad(time.minutes), unit: 'Minutes' },
-          { value: pad(time.seconds), unit: 'Seconds' },
-        ].map(({ value, unit }, i) => (
-          <React.Fragment key={unit}>
-            <div className="countdown-block">
-              <span className="countdown-num">{value}</span>
-              <span className="countdown-unit">{unit}</span>
-            </div>
-            {i < 3 && <span className="countdown-sep">:</span>}
-          </React.Fragment>
-        ))}
+    <div ref={ref} className="launch-announce">
+      {/* Fire curtains — sweep in from both sides */}
+      <div className="fire-curtain fire-left" aria-hidden="true">
+        <div className="fire-layer fire-layer-1"></div>
+        <div className="fire-layer fire-layer-2"></div>
+        <div className="fire-layer fire-layer-3"></div>
       </div>
-      <p className="countdown-sub">The Active Build Phase Commences Soon</p>
+      <div className="fire-curtain fire-right" aria-hidden="true">
+        <div className="fire-layer fire-layer-1"></div>
+        <div className="fire-layer fire-layer-2"></div>
+        <div className="fire-layer fire-layer-3"></div>
+      </div>
+      <div className="fire-collision" aria-hidden="true"></div>
+      <div className="fire-shockwave" aria-hidden="true"></div>
+
+      {/* Ambient embers */}
+      <div className="launch-embers" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span>
+      </div>
+      <div className="launch-flame-glow" aria-hidden="true"></div>
+
+      {/* Content */}
+      <div className="launch-content">
+        <div className="launch-status">
+          <span className="launch-flame-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2s4 4.5 4 8a4 4 0 1 1-8 0c0-1.5.8-2.8 1.6-3.5C10.3 8.8 10 10 11 11c-.5-2 .5-4 1-5 .3-.6 0-2 0-4z" fill="url(#flame-g)"/>
+              <path d="M12 9s2 2 2 4a2 2 0 1 1-4 0c0-.8.4-1.4.8-1.8-.1.6 0 1 .4 1.3-.2-1 .3-2 .8-2.5.1-.3 0-.6 0-1z" fill="#fff4c2"/>
+              <defs>
+                <linearGradient id="flame-g" x1="12" y1="2" x2="12" y2="18" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stopColor="#ffd27a"/>
+                  <stop offset="0.45" stopColor="#ff6a2d"/>
+                  <stop offset="1" stopColor="#e8001d"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+          <span className="launch-status-text">The Spark Has Been Lit</span>
+        </div>
+
+        <h3 className="launch-heading">
+          <span className="launch-line-1">A New Era of Dating</span>
+          <span className="launch-ignite-wrap">
+            <span className="launch-ignite">Ignites</span>
+          </span>
+          <span className="launch-line-3">
+            <span className="launch-month">September</span>
+            <span className="launch-dot" aria-hidden="true"></span>
+            <span className="launch-year">2026</span>
+          </span>
+        </h3>
+
+        <p className="launch-sub">
+          The official build is underway — a bold new way to meet and connect is almost here.
+        </p>
+      </div>
     </div>
   );
 }
@@ -144,7 +162,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content animate-fade-in">
-          <div className="hero-eyebrow">Beta Launching Late Summer Launch 2026</div>
+          <div className="hero-eyebrow">Beta Launching September 2026</div>
           <h1 className="hero-title">The End of the <span className="gradient-text">Swipe Era</span>.</h1>
           <p className="hero-subtitle">No Paywalls. No Pressure. Just People.</p>
           <p className="hero-tagline">A New Kind of Hybrid Connection Platform.</p>
@@ -159,7 +177,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
             <button type="submit" className="btn-primary">Join Waiting List</button>
           </form>
           {joined && <p className="success-msg">✓ Welcome to the inner circle. Stay tuned.</p>}
-          <Countdown />
+          <LaunchAnnounce />
         </div>
       </header>
 

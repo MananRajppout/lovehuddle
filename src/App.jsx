@@ -98,7 +98,7 @@ function LaunchAnnounce() {
         </div>
 
         <h3 className="launch-heading">
-          <span className="launch-line-1">A New Era of Dating</span>
+          <span className="launch-line-1">A New Era of Social/Dating</span>
           <span className="launch-ignite-wrap">
             <span className="launch-ignite">Ignites</span>
           </span>
@@ -110,7 +110,7 @@ function LaunchAnnounce() {
         </h3>
 
         <p className="launch-sub">
-          The official build is underway — a bold new way to meet and connect is almost here.
+          The official build is underway — where dating and real-world social connection finally come together.
         </p>
       </div>
     </div>

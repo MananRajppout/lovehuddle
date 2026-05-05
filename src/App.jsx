@@ -5,6 +5,7 @@ import './App.css';
 import logo from './assets/images/logo.png';
 import heroBg from './assets/images/hero-bg.png';
 import finalistBadge from './assets/images/badge.jpeg';
+import aiHuddleCore from './assets/images/aihuddlecore.png';
 import Admin from './Admin';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
@@ -47,6 +48,28 @@ function RevealSection({ children, className = '', ...props }) {
   return (
     <div ref={ref} className={`reveal ${className}`} {...props}>
       {children}
+    </div>
+  );
+}
+
+/* ─── Powered by AI-Huddle-Core ─── */
+function PoweredByCore() {
+  const ref = useReveal();
+  return (
+    <div ref={ref} className="powered-by-core">
+      <div className="powered-by-glow" aria-hidden="true"></div>
+      <div className="powered-by-inner">
+        <img
+          src={aiHuddleCore}
+          alt="AI-Huddle-Core"
+          className="powered-by-logo"
+        />
+        <div className="powered-by-divider" aria-hidden="true"></div>
+        <p className="powered-by-text">
+          Powered by <span className="powered-by-name">AI&#8209;Huddle&#8209;Core&trade;</span>
+          {' '}— the calm intelligence behind every safe 1&#8209;to&#8209;1 Huddle.
+        </p>
+      </div>
     </div>
   );
 }
@@ -180,6 +203,11 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
           <LaunchAnnounce />
         </div>
       </header>
+
+      {/* Powered by AI-Huddle-Core (between hero and disruption) */}
+      <section className="powered-by-section">
+        <PoweredByCore />
+      </section>
 
       {/* Disruption Section */}
       <section id="disruption" className="section-container section-disruption">

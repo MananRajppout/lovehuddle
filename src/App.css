@@ -710,6 +710,134 @@
   animation: statusPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 1.25s forwards;
 }
 
+/* ─── Powered by AI-Huddle-Core (between hero and disruption) ─── */
+.powered-by-section {
+  position: relative;
+  padding: 2rem 1.5rem 0.25rem;
+  display: flex;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(232, 0, 29, 0.05), transparent 70%);
+}
+
+.powered-by-core {
+  position: relative;
+  margin: 0 auto;
+  max-width: 620px;
+  width: 100%;
+  padding: 0.85rem 1.15rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  border: 1px solid rgba(255, 180, 80, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.powered-by-core.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.powered-by-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 15% 50%,
+    rgba(255, 160, 60, 0.18),
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.powered-by-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  z-index: 1;
+}
+
+.powered-by-logo {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 0 12px rgba(255, 140, 50, 0.35));
+}
+
+.powered-by-divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 180, 80, 0.4),
+    transparent
+  );
+  flex-shrink: 0;
+}
+
+.powered-by-text {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--lh-text-muted);
+  letter-spacing: 0.01em;
+  text-align: left;
+}
+
+.powered-by-name {
+  font-weight: 800;
+  background: linear-gradient(90deg, #ffd27a, #ff8a3d, #e8001d, #ff8a3d, #ffd27a);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: launchShimmer 4.5s ease-in-out infinite;
+  white-space: nowrap;
+  letter-spacing: 0.005em;
+}
+
+@media (max-width: 560px) {
+  .powered-by-core {
+    margin-top: 1.2rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 16px;
+  }
+  .powered-by-inner {
+    gap: 0.7rem;
+  }
+  .powered-by-logo {
+    width: 38px;
+    height: 38px;
+  }
+  .powered-by-text {
+    font-size: 0.74rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .powered-by-core,
+  .powered-by-core.revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .powered-by-name {
+    animation: none !important;
+  }
+}
+
 .launch-flame-icon {
   width: 18px;
   height: 18px;

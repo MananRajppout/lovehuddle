@@ -56,7 +56,14 @@ function RevealSection({ children, className = '', ...props }) {
 function PoweredByCore() {
   const ref = useReveal();
   return (
-    <div ref={ref} className="powered-by-core">
+    <a
+      ref={ref}
+      href="https://aihuddlecore.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="powered-by-core"
+      aria-label="Visit AI-Huddle-Core"
+    >
       <div className="powered-by-glow" aria-hidden="true"></div>
       <div className="powered-by-inner">
         <img
@@ -70,7 +77,7 @@ function PoweredByCore() {
           {' '}— the calm intelligence behind every safe 1&#8209;to&#8209;1 Huddle.
         </p>
       </div>
-    </div>
+    </a>
   );
 }
 
@@ -230,7 +237,7 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
             <div className="feature-card">
               <div className="feature-icon">🛡️</div>
               <h3>Bot-Free</h3>
-              <p>A one‑time small £4 verification fee ensures safety and a community of real humans. First 500 are FREE.</p>
+              <p>Free launch‑phase verification to keep LoveHuddle real.</p>
             </div>
           </div>
         </RevealSection>

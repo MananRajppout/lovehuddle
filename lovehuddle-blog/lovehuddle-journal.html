@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoveHuddle — The Journal</title>
+<meta name="description" content="Founder thoughts, dating culture, and how we're building something that actually works.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   CSS VARIABLES — hand these to programmer
+   ═══════════════════════════════════════ */
+:root {
+  --bg:           #F7F3EE;
+  --bg-card:      #FFFFFF;
+  --ember:        #1A1008;
+  --ember-mid:    #2D1A08;
+  --ember-light:  #3D2010;
+  --amber:        #C8922A;
+  --amber-lt:     #E8B96A;
+  --coral:        #E05A5A;
+  --dark:         #1A1008;
+  --mid:          #5C4A36;
+  --muted:        #9A8A78;
+  --border:       #E8DDD0;
+  --safe-green:   #4CAF7D;
+  --radius:       14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--dark);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ════════════════════════
+   NAV
+════════════════════════ */
+nav {
+  background: var(--ember);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 68px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 1px solid rgba(200,146,42,0.15);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--coral), var(--amber));
+  border-radius: 50% 50% 50% 0 / 60% 60% 40% 40%;
+  transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark::after { content:'🤝'; font-size:14px; transform:rotate(45deg); }
+
+.logo-text {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600; font-size: 18px;
+  color: white; letter-spacing: 0.02em;
+}
+.logo-text span { color: var(--coral); }
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+.nav-links a {
+  color: #C4B5A0; text-decoration: none;
+  font-size: 13px; letter-spacing: 0.05em;
+  text-transform: uppercase; transition: color 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--amber); }
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+
+.safe-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(76,175,125,0.15);
+  border: 1px solid rgba(76,175,125,0.3);
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 12px; color: var(--safe-green);
+  letter-spacing: 0.04em;
+}
+.safe-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--safe-green);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:0.5; transform:scale(1.3); }
+}
+
+.btn-waitlist {
+  background: var(--amber);
+  color: var(--ember) !important;
+  padding: 9px 22px; border-radius: 100px;
+  font-weight: 600 !important; font-size: 13px !important;
+  text-transform: none !important; letter-spacing: 0 !important;
+  transition: background 0.2s;
+}
+.btn-waitlist:hover { background: var(--amber-lt); }
+
+/* ════════════════════════
+   BLOG HERO
+════════════════════════ */
+.blog-hero {
+  background: linear-gradient(160deg, var(--ember) 0%, var(--ember-mid) 55%, var(--ember-light) 100%);
+  padding: 88px 48px 72px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.blog-hero::before {
+  content:'';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 110%, rgba(200,146,42,0.3) 0%, transparent 60%);
+}
+.blog-hero::after {
+  content:'';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,146,42,0.4), transparent);
+}
+
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--amber);
+  margin-bottom: 18px; position: relative;
+}
+.blog-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 6vw, 76px);
+  font-weight: 700; color: #F7F3EE;
+  line-height: 1.1; position: relative;
+  margin-bottom: 18px;
+}
+.blog-hero h1 em { font-style: italic; color: var(--amber-lt); }
+.blog-hero p {
+  color: #C4B5A0; font-size: 16px;
+  max-width: 500px; margin: 0 auto 32px;
+  line-height: 1.75; position: relative;
+}
+
+/* Search bar */
+.hero-search {
+  position: relative; max-width: 480px;
+  margin: 0 auto; z-index: 1;
+}
+.hero-search input {
+  width: 100%; padding: 16px 56px 16px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(200,146,42,0.3);
+  background: rgba(255,255,255,0.08);
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; outline: none;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s;
+}
+.hero-search input::placeholder { color: rgba(196,181,160,0.6); }
+.hero-search input:focus { border-color: var(--amber); }
+.hero-search-icon {
+  position: absolute; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--amber); font-size: 18px; cursor: pointer;
+}
+
+/* ════════════════════════
+   CATEGORY PILLS
+════════════════════════ */
+.categories {
+  display: flex; gap: 10px;
+  padding: 24px 48px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky; top: 68px; z-index: 100;
+  scrollbar-width: none;
+}
+.categories::-webkit-scrollbar { display: none; }
+
+.pill {
+  white-space: nowrap;
+  padding: 8px 20px; border-radius: 100px;
+  font-size: 13px; letter-spacing: 0.02em;
+  cursor: pointer; border: 1px solid var(--border);
+  color: var(--mid); background: white;
+  transition: all 0.2s; user-select: none;
+}
+.pill.active { background: var(--dark); color: var(--amber-lt); border-color: var(--dark); }
+.pill:hover:not(.active) { border-color: var(--amber); color: var(--amber); }
+
+/* ════════════════════════
+   PAGE LAYOUT
+════════════════════════ */
+.page-wrap {
+  max-width: 1220px; margin: 0 auto;
+  padding: 56px 48px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 64px; align-items: start;
+}
+
+/* ════════════════════════
+   FEATURED POST
+════════════════════════ */
+.featured-wrap {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+}
+.section-label {
+  font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::after {
+  content:''; flex:1; height:1px; background: var(--border);
+}
+
+.featured-card {
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  border-radius: 20px; overflow: hidden;
+  background: var(--ember); min-height: 420px;
+  box-shadow: 0 24px 64px rgba(26,16,8,0.2);
+}
+
+/* ── Photo slot ── */
+.featured-photo {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #2D1A08, #4A2810);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 300px;
+}
+.featured-photo::before {
+  content:'';
+  position: absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 70%, rgba(200,146,42,0.35) 0%, transparent 60%);
+}
+/* PROGRAMMER NOTE: replace .photo-placeholder with <img src="..." /> */
+.photo-placeholder {
+  position: relative; z-index:1;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px; text-align: center;
+  padding: 40px;
+}
+.photo-placeholder .icon { font-size: 64px; opacity: 0.7; }
+.photo-placeholder p {
+  color: rgba(196,181,160,0.5);
+  font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px dashed rgba(200,146,42,0.3);
+  padding: 8px 16px; border-radius: 8px;
+}
+.featured-tag {
+  position: absolute; top: 20px; left: 20px; z-index:2;
+  background: var(--coral); color: white;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 100px;
+}
+
+/* ── Featured content ── */
+.featured-body {
+  padding: 52px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.featured-meta {
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.reading-time {
+  background: rgba(200,146,42,0.15);
+  color: var(--amber); padding: 2px 10px;
+  border-radius: 100px; font-size: 11px;
+}
+.featured-body h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700;
+  color: #F7F3EE; line-height: 1.25;
+  margin-bottom: 16px;
+}
+.featured-body h2 em { color: var(--amber-lt); font-style: italic; }
+.featured-body p {
+  color: #9A8A78; font-size: 15px;
+  line-height: 1.75; margin-bottom: 28px;
+}
+.btn-read {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amber); color: var(--ember);
+  padding: 13px 26px; border-radius: 100px;
+  font-size: 14px; font-weight: 600;
+  text-decoration: none; width: fit-content;
+  transition: background 0.2s;
+}
+.btn-read:hover { background: var(--amber-lt); }
+
+/* ════════════════════════
+   POST LIST
+════════════════════════ */
+.posts-col { display: flex; flex-direction: column; }
+
+.post-card {
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 22px; padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none; color: inherit;
+  transition: opacity 0.2s;
+}
+.post-card:hover { opacity: 0.72; }
+
+/* ── Thumbnail (photo slot) ── */
+.post-thumb {
+  border-radius: 12px; overflow: hidden;
+  background: linear-gradient(135deg, var(--ember), #3D2010);
+  height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0;
+}
+.post-thumb::before {
+  content:''; position: absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 70%, rgba(200,146,42,0.25) 0%, transparent 70%);
+}
+/* PROGRAMMER NOTE: replace .thumb-icon with <img src="..." style="width:100%;height:100%;object-fit:cover" /> */
+.thumb-icon { font-size: 34px; position: relative; z-index:1; }
+
+/* ── Video badge ── */
+.video-badge {
+  position: absolute; bottom: 8px; right: 8px; z-index:2;
+  background: rgba(0,0,0,0.7); color: white;
+  font-size: 10px; padding: 3px 8px; border-radius: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+.video-badge::before { content: '▶'; font-size: 8px; color: var(--coral); }
+
+/* ── Quiz badge ── */
+.quiz-badge {
+  position: absolute; bottom: 8px; right: 8px; z-index:2;
+  background: rgba(200,146,42,0.85); color: var(--ember);
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+}
+
+.post-info {}
+.post-tag {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--coral); margin-bottom: 7px;
+}
+.post-tag.safety { color: var(--safe-green); }
+.post-tag.ai { color: var(--amber); }
+
+.post-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700;
+  color: var(--dark); line-height: 1.35;
+  margin-bottom: 8px;
+}
+.post-info p {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; margin-bottom: 10px;
+}
+.post-footer {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--muted);
+}
+.post-footer .dot { color: var(--border); }
+
+/* ════════════════════════
+   SINGLE POST VIEW
+   (what a post looks like when open)
+════════════════════════ */
+.post-view {
+  background: white; border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(26,16,8,0.08);
+  margin-bottom: 48px;
+}
+
+/* Hero image of post */
+.post-hero-img {
+  width: 100%; height: 340px;
+  background: linear-gradient(135deg, var(--ember), var(--ember-light));
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.post-hero-img::before {
+  content:''; position: absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(200,146,42,0.3) 0%, transparent 60%);
+}
+/* PROGRAMMER NOTE: replace with <img src="..." style="width:100%;height:100%;object-fit:cover" /> */
+.post-hero-placeholder {
+  text-align: center; position: relative; z-index:1;
+}
+.post-hero-placeholder .big-icon { font-size: 72px; margin-bottom: 12px; }
+.post-hero-placeholder p {
+  color: rgba(196,181,160,0.5); font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px dashed rgba(200,146,42,0.3);
+  padding: 8px 20px; border-radius: 8px; display: inline-block;
+}
+
+.post-content { padding: 48px 52px; }
+
+.post-header { margin-bottom: 32px; }
+.post-category-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.post-cat-tag {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--coral);
+}
+.post-cat-tag.safety { color: var(--safe-green); }
+.post-date-rt {
+  font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.post-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 700; line-height: 1.2;
+  color: var(--dark); margin-bottom: 12px;
+}
+.post-content h1 em { color: var(--amber); font-style: italic; }
+
+.author-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 0; border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); margin-bottom: 36px;
+}
+.author-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber), var(--coral));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.author-info p { font-size: 14px; font-weight: 500; color: var(--dark); }
+.author-info span { font-size: 12px; color: var(--muted); }
+
+/* ── Body text ── */
+.body-text { font-size: 16px; line-height: 1.85; color: #3D2D1E; }
+.body-text p { margin-bottom: 22px; }
+.body-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--dark); margin: 36px 0 16px;
+}
+.body-text blockquote {
+  border-left: 3px solid var(--amber);
+  padding: 16px 24px; margin: 28px 0;
+  background: rgba(200,146,42,0.06);
+  border-radius: 0 10px 10px 0;
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 18px;
+  color: var(--mid);
+}
+
+/* ── PHOTO in post ── */
+.inline-photo {
+  margin: 32px 0; border-radius: 14px; overflow: hidden;
+}
+.inline-photo img {
+  width: 100%; display: block;
+  /* PROGRAMMER NOTE: src="your-image-url" */
+}
+.inline-photo-placeholder {
+  background: linear-gradient(135deg, #F0E8DC, #E8DDD0);
+  height: 280px; display: flex;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; color: var(--muted);
+}
+.inline-photo-placeholder span { font-size: 40px; }
+.inline-photo-placeholder p { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.photo-caption {
+  font-size: 13px; color: var(--muted); font-style: italic;
+  text-align: center; margin-top: 10px;
+}
+
+/* ── VIDEO EMBED ── */
+.video-embed {
+  margin: 36px 0; border-radius: 14px; overflow: hidden;
+  background: var(--ember); position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+}
+.video-embed iframe {
+  position: absolute; top:0; left:0;
+  width:100%; height:100%; border:none;
+  /* PROGRAMMER NOTE:
+     Ghost CMS: paste YouTube/Vimeo URL into embed card
+     Next.js: use react-player or iframe with YouTube embed URL
+     src="https://www.youtube.com/embed/VIDEO_ID"
+  */
+}
+/* Placeholder until real video added */
+.video-placeholder {
+  position: absolute; inset:0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; background: var(--ember);
+}
+.play-btn {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--coral);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; cursor: pointer;
+  box-shadow: 0 8px 32px rgba(224,90,90,0.4);
+  transition: transform 0.2s;
+}
+.play-btn:hover { transform: scale(1.08); }
+.video-placeholder p { color: var(--muted); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ── QUIZ BLOCK ── */
+.quiz-block {
+  margin: 40px 0; border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.quiz-header {
+  background: var(--ember);
+  padding: 24px 28px;
+  display: flex; align-items: center; gap: 12px;
+}
+.quiz-icon { font-size: 24px; }
+.quiz-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: #F7F3EE; font-weight: 700;
+}
+.quiz-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.quiz-body { background: white; padding: 28px; }
+
+.quiz-q {
+  font-size: 16px; font-weight: 500;
+  color: var(--dark); margin-bottom: 16px;
+  padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.quiz-q span {
+  display: block; font-size: 12px; font-weight: 400;
+  color: var(--muted); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+
+.quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+.quiz-opt {
+  padding: 14px 18px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg);
+  cursor: pointer; font-size: 14px; color: var(--mid);
+  transition: all 0.18s; display: flex; align-items: center; gap: 12px;
+}
+.quiz-opt:hover { border-color: var(--amber); color: var(--dark); }
+.quiz-opt.selected { border-color: var(--amber); background: rgba(200,146,42,0.08); color: var(--dark); }
+.quiz-opt.correct { border-color: var(--safe-green); background: rgba(76,175,125,0.08); color: var(--dark); }
+.quiz-opt.wrong { border-color: var(--coral); background: rgba(224,90,90,0.08); }
+
+.opt-letter {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--border); color: var(--mid);
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.quiz-opt.selected .opt-letter { background: var(--amber); color: white; }
+.quiz-opt.correct .opt-letter { background: var(--safe-green); color: white; }
+
+.btn-quiz {
+  width: 100%; padding: 14px;
+  border-radius: 100px; border: none;
+  background: var(--dark); color: var(--amber-lt);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+  letter-spacing: 0.02em;
+}
+.btn-quiz:hover { background: var(--ember-light); }
+
+.quiz-result {
+  display: none; /* shown via JS after submit */
+  margin-top: 16px; padding: 16px 20px;
+  border-radius: 10px; font-size: 14px; line-height: 1.6;
+  background: rgba(200,146,42,0.08);
+  border: 1px solid rgba(200,146,42,0.2);
+  color: var(--mid);
+}
+
+/* ── SAFETY PANEL ── */
+.safety-panel {
+  margin: 40px 0; border-radius: 16px;
+  background: linear-gradient(135deg, var(--ember) 0%, #2D1A08 100%);
+  padding: 32px; position: relative; overflow: hidden;
+}
+.safety-panel::before {
+  content:'';
+  position: absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background: radial-gradient(circle, rgba(76,175,125,0.2) 0%, transparent 70%);
+}
+.safety-panel-head {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.shield-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(76,175,125,0.15);
+  border: 1px solid rgba(76,175,125,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.safety-panel-head h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: #F7F3EE; font-weight: 700;
+}
+.safety-panel-head p { font-size: 13px; color: var(--muted); }
+
+.safety-items { display: flex; flex-direction: column; gap: 12px; }
+.safety-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.safety-item-icon { font-size: 20px; flex-shrink:0; margin-top:2px; }
+.safety-item-text p { font-size: 13px; font-weight: 500; color: #E8DDD0; margin-bottom: 3px; }
+.safety-item-text span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── SHARE ROW ── */
+.share-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 24px 0; border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+.share-label { font-size: 13px; color: var(--muted); margin-right: 4px; }
+.share-btn {
+  padding: 8px 18px; border-radius: 100px;
+  border: 1px solid var(--border); background: white;
+  font-size: 13px; color: var(--mid); cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s; text-decoration: none;
+}
+.share-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+/* ════════════════════════
+   SIDEBAR
+════════════════════════ */
+.sidebar { display: flex; flex-direction: column; gap: 28px; }
+
+.widget {
+  background: white; border-radius: 16px;
+  padding: 28px; border: 1px solid var(--border);
+}
+.widget-title {
+  font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Launch widget */
+.widget-launch {
+  background: linear-gradient(160deg, var(--ember), var(--ember-mid));
+  border: none; text-align: center;
+}
+.widget-launch .widget-title { color: #6B5A48; border-color: rgba(255,255,255,0.08); }
+.launch-date {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--amber-lt); margin-bottom: 4px;
+}
+.launch-sub { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.progress-bar {
+  height: 4px; background: rgba(255,255,255,0.08);
+  border-radius: 2px; margin-top: 18px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; width: 64%;
+  background: linear-gradient(90deg, var(--amber), var(--coral));
+  border-radius: 2px;
+}
+
+/* Founder widget */
+.founder-widget { text-align: center; }
+.founder-av {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber), var(--coral));
+  margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+}
+.founder-widget h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: var(--dark); margin-bottom: 8px;
+}
+.founder-widget p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+/* Topics */
+.topic-list { display: flex; flex-direction: column; gap: 2px; }
+.topic-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 14px; color: var(--mid); text-decoration: none;
+  transition: background 0.2s;
+}
+.topic-item:hover { background: var(--bg); color: var(--amber); }
+.topic-count {
+  font-size: 12px; color: var(--muted);
+  background: var(--bg); padding: 2px 9px; border-radius: 100px;
+}
+
+/* Newsletter */
+.widget-newsletter {
+  background: linear-gradient(140deg, var(--ember), #2D1A08);
+  border: none;
+}
+.widget-newsletter .widget-title { color: #6B5A48; border-color: rgba(255,255,255,0.08); }
+.widget-newsletter h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: #F7F3EE; margin-bottom: 8px;
+}
+.widget-newsletter p { font-size: 13px; color: #9A8A78; line-height: 1.65; margin-bottom: 16px; }
+.nl-input {
+  width: 100%; padding: 11px 18px; border-radius: 100px;
+  border: 1px solid rgba(200,146,42,0.3);
+  background: rgba(255,255,255,0.05);
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; outline: none; margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.nl-input::placeholder { color: #6B5A48; }
+.nl-input:focus { border-color: var(--amber); }
+.btn-sub {
+  width: 100%; padding: 12px; border-radius: 100px;
+  background: var(--amber); color: var(--ember);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600; border: none;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-sub:hover { background: var(--amber-lt); }
+
+/* Safety sidebar widget */
+.widget-safe {
+  background: linear-gradient(140deg, #0D1F15, #0A1A10);
+  border: 1px solid rgba(76,175,125,0.2);
+}
+.widget-safe .widget-title { color: rgba(76,175,125,0.5); border-color: rgba(76,175,125,0.1); }
+.safe-items { display: flex; flex-direction: column; gap: 10px; }
+.safe-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: #9AB89A;
+}
+.safe-check { color: var(--safe-green); font-size: 15px; flex-shrink:0; }
+.powered-by {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid rgba(76,175,125,0.1);
+  font-size: 12px; color: rgba(76,175,125,0.5);
+  text-align: center; letter-spacing: 0.04em;
+}
+.powered-by strong { color: var(--amber); }
+
+/* Pagination */
+.pagination {
+  display: flex; gap: 8px; margin-top: 40px; align-items: center;
+}
+.page-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--border); background: white;
+  cursor: pointer; font-size: 14px; color: var(--mid);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.page-btn.active { background: var(--dark); color: var(--amber-lt); border-color: var(--dark); }
+.page-btn:hover:not(.active) { border-color: var(--amber); color: var(--amber); }
+
+/* ════════════════════════
+   FOOTER
+════════════════════════ */
+footer {
+  background: var(--ember);
+  padding: 52px 48px 36px;
+  margin-top: 80px; text-align: center;
+  border-top: 1px solid rgba(200,146,42,0.15);
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; color: #F7F3EE; margin-bottom: 8px;
+}
+.footer-logo span { color: var(--coral); }
+footer p { color: #5C4A36; font-size: 13px; line-height: 2.2; }
+footer a { color: var(--amber); text-decoration: none; }
+
+/* ════════════════════════
+   RESPONSIVE — TABLET
+════════════════════════ */
+@media (max-width: 960px) {
+  .page-wrap { grid-template-columns: 1fr; padding: 32px 24px; gap: 40px; }
+  .featured-card { grid-template-columns: 1fr; }
+  .featured-photo { height: 220px; }
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .blog-hero { padding: 60px 24px 48px; }
+  .categories { padding: 18px 24px; }
+  .post-content { padding: 32px 24px; }
+  .post-hero-img { height: 260px; }
+}
+
+/* ════════════════════════
+   RESPONSIVE — MOBILE
+════════════════════════ */
+@media (max-width: 600px) {
+
+  /* NAV */
+  nav {
+    padding: 0 16px;
+    height: 58px;
+  }
+  .logo-text { font-size: 15px; }
+  .logo-mark { width: 32px; height: 32px; }
+  .safe-badge { display: none; }
+  .nav-right { gap: 8px; }
+
+  /* HERO */
+  .blog-hero {
+    padding: 48px 20px 40px;
+  }
+  .blog-hero h1 {
+    font-size: 32px;
+    margin-bottom: 14px;
+  }
+  .blog-hero p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .hero-search input {
+    padding: 13px 48px 13px 18px;
+    font-size: 14px;
+  }
+
+  /* CATEGORY PILLS */
+  .categories {
+    padding: 14px 16px;
+    gap: 8px;
+    top: 58px;
+  }
+  .pill {
+    padding: 7px 16px;
+    font-size: 12px;
+  }
+
+  /* PAGE WRAP */
+  .page-wrap {
+    padding: 24px 16px;
+    gap: 32px;
+  }
+
+  /* FEATURED CARD */
+  .featured-card {
+    border-radius: 14px;
+    min-height: unset;
+  }
+  .featured-photo {
+    height: 180px;
+  }
+  .featured-body {
+    padding: 24px 20px;
+  }
+  .featured-body h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .featured-body p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .btn-read {
+    padding: 11px 20px;
+    font-size: 13px;
+  }
+
+  /* POST CARDS */
+  .post-card {
+    grid-template-columns: 90px 1fr;
+    gap: 14px;
+    padding: 20px 0;
+  }
+  .post-thumb {
+    height: 80px;
+    border-radius: 10px;
+  }
+  .thumb-icon { font-size: 26px; }
+  .post-info h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .post-info p {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+  .post-footer {
+    font-size: 11px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* PAGINATION */
+  .pagination { margin-top: 28px; }
+  .page-btn { width: 34px; height: 34px; font-size: 13px; }
+
+  /* SIDEBAR — stacks under posts on mobile */
+  .sidebar { gap: 20px; }
+  .widget { padding: 20px; border-radius: 12px; }
+  .launch-date { font-size: 24px; }
+  .founder-av { width: 56px; height: 56px; font-size: 24px; }
+  .founder-widget h4 { font-size: 16px; }
+  .founder-widget p { font-size: 13px; }
+
+  /* SINGLE POST VIEW */
+  .post-view { border-radius: 14px; }
+  .post-hero-img { height: 200px; }
+  .post-content { padding: 24px 16px; }
+  .post-content h1 { font-size: 24px; }
+  .body-text { font-size: 15px; }
+  .body-text blockquote {
+    font-size: 16px;
+    padding: 12px 18px;
+  }
+  .body-text h2 { font-size: 20px; }
+
+  /* INLINE PHOTO */
+  .inline-photo-placeholder { height: 200px; }
+
+  /* SAFETY PANEL */
+  .safety-panel { padding: 22px 18px; }
+  .safety-panel-head h4 { font-size: 17px; }
+  .safety-item { padding: 12px 14px; }
+
+  /* QUIZ */
+  .quiz-header { padding: 18px 20px; }
+  .quiz-header h3 { font-size: 17px; }
+  .quiz-body { padding: 20px 16px; }
+  .quiz-opt { padding: 12px 14px; font-size: 13px; }
+  .opt-letter { width: 24px; height: 24px; font-size: 11px; }
+
+  /* SHARE ROW */
+  .share-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+  .share-btn { padding: 7px 14px; font-size: 12px; }
+
+  /* FOOTER */
+  footer {
+    padding: 36px 20px 28px;
+    margin-top: 48px;
+  }
+  footer p { font-size: 12px; }
+  .footer-logo { font-size: 20px; }
+
+  /* AUTHOR ROW */
+  .author-row { gap: 10px; }
+  .author-avatar { width: 38px; height: 38px; font-size: 18px; }
+  .author-info p { font-size: 13px; }
+  .author-info span { font-size: 11px; }
+
+  /* SECTION LABELS */
+  .section-label { font-size: 10px; }
+
+  /* NEWSLETTER WIDGET */
+  .widget-newsletter h4 { font-size: 16px; }
+  .nl-input { padding: 10px 16px; font-size: 13px; }
+  .btn-sub { padding: 11px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-mark"></div>
+    <span class="logo-text"><span>LOVE</span>HUDDLE</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#" class="active">Journal</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#" class="btn-waitlist">Join Waitlist</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="safe-badge"><div class="safe-dot"></div> Safe & Verified</div>
+  </div>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<div class="blog-hero">
+  <p class="hero-eyebrow">✦ The LoveHuddle Journal</p>
+  <h1>Dating, Differently.<br><em>Written Honestly.</em></h1>
+  <p>Founder thoughts, dating culture, safety insights, and how we're building something that actually works.</p>
+  <div class="hero-search">
+    <input type="text" placeholder="Search the journal…">
+    <div class="hero-search-icon">⌕</div>
+  </div>
+</div>
+
+<!-- ══════════ CATEGORIES ══════════ -->
+<div class="categories">
+  <div class="pill active">All Posts</div>
+  <div class="pill">Founder Notes</div>
+  <div class="pill">Dating Culture</div>
+  <div class="pill">Safety & Trust</div>
+  <div class="pill">AI & Design</div>
+  <div class="pill">LoveHuddle News</div>
+  <div class="pill">Quizzes</div>
+  <div class="pill">Real Connections</div>
+</div>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="page-wrap">
+
+  <!-- ── FEATURED ── -->
+  <div class="featured-wrap">
+    <div class="section-label">Featured Post</div>
+    <div class="featured-card">
+      <div class="featured-photo">
+        <div class="featured-tag">Featured</div>
+        <!-- PROGRAMMER: replace .photo-placeholder with <img src="..." style="width:100%;height:100%;object-fit:cover"> -->
+        <div class="photo-placeholder">
+          <div class="icon">🔥</div>
+          <p>Hero image goes here</p>
+        </div>
+      </div>
+      <div class="featured-body">
+        <div class="featured-meta">
+          Founder Notes &nbsp;·&nbsp; May 2026
+          <span class="reading-time">5 min read</span>
+        </div>
+        <h2>Why We Burned the <em>Swipe.</em></h2>
+        <p>Swipe culture was never broken by accident. It was engineered to keep you scrolling. Here's why LoveHuddle is built on a fundamentally different premise — and what that means for how you'll actually meet someone.</p>
+        <a href="#post-example" class="btn-read">Read the Story →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POST LIST ── -->
+  <div class="posts-col">
+    <div class="section-label">Latest Posts</div>
+
+    <!-- Post with VIDEO -->
+    <a href="#" class="post-card">
+      <div class="post-thumb">
+        <span class="thumb-icon">🛡️</span>
+        <!-- PROGRAMMER: swap emoji for <img src="photo.jpg" style="width:100%;height:100%;object-fit:cover"> -->
+        <div class="video-badge">VIDEO</div>
+      </div>
+      <div class="post-info">
+        <div class="post-tag safety">Safety & Trust</div>
+        <h3>The Shield Protocol: How AI-Huddle-Core™ Keeps Every Huddle Safe</h3>
+        <p>Proactive safety isn't a feature — it's the foundation. Watch the explainer and read the full breakdown.</p>
+        <div class="post-footer">
+          <span>12 May 2026</span>
+          <span class="dot">·</span>
+          <span>7 min read</span>
+          <span class="dot">·</span>
+          <span>▶ Includes video</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Post with QUIZ -->
+    <a href="#" class="post-card">
+      <div class="post-thumb">
+        <span class="thumb-icon">🤔</span>
+        <div class="quiz-badge">QUIZ</div>
+      </div>
+      <div class="post-info">
+        <div class="post-tag">Dating Culture</div>
+        <h3>Are You Actually Ready to Date Again? Take the Quiz</h3>
+        <p>Not a trick question. A genuinely useful 5-minute quiz to help you figure out where you're at.</p>
+        <div class="post-footer">
+          <span>8 May 2026</span>
+          <span class="dot">·</span>
+          <span>5 min quiz</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Post with photo -->
+    <a href="#" class="post-card">
+      <div class="post-thumb">
+        <span class="thumb-icon">🤝</span>
+      </div>
+      <div class="post-info">
+        <div class="post-tag">Real Connections</div>
+        <h3>What "1-to-1 Huddle" Actually Means — and Why It Changes Everything</h3>
+        <p>No galleries. No queues. When you meet someone on LoveHuddle, you have their full attention.</p>
+        <div class="post-footer">
+          <span>5 May 2026</span>
+          <span class="dot">·</span>
+          <span>4 min read</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- AI post -->
+    <a href="#" class="post-card">
+      <div class="post-thumb">
+        <span class="thumb-icon">🧠</span>
+      </div>
+      <div class="post-info">
+        <div class="post-tag ai">AI & Design</div>
+        <h3>Eliminate the Interview: Building AI That Learns Without Interrogating You</h3>
+        <p>Nobody wants 47 questions to find love. We built something that figures it out quietly instead.</p>
+        <div class="post-footer">
+          <span>28 Apr 2026</span>
+          <span class="dot">·</span>
+          <span>6 min read</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- News post -->
+    <a href="#" class="post-card">
+      <div class="post-thumb">
+        <span class="thumb-icon">🏆</span>
+      </div>
+      <div class="post-info">
+        <div class="post-tag">LoveHuddle News</div>
+        <h3>UK Top 5 Finalist — What It Means at This Stage of the Build</h3>
+        <p>A moment to breathe and reflect. What the Wales regional final means for a solo founder building in public.</p>
+        <div class="post-footer">
+          <span>18 Apr 2026</span>
+          <span class="dot">·</span>
+          <span>3 min read</span>
+        </div>
+      </div>
+    </a>
+
+    <div class="pagination">
+      <div class="page-btn active">1</div>
+      <div class="page-btn">2</div>
+      <div class="page-btn">3</div>
+      <div class="page-btn">→</div>
+    </div>
+  </div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="widget widget-launch">
+      <div class="widget-title">Launch Status</div>
+      <div class="launch-date">September 2026</div>
+      <div class="launch-sub">UK Launch · Build in progress</div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+
+    <div class="widget founder-widget">
+      <div class="widget-title">About This Journal</div>
+      <div class="founder-av">👤</div>
+      <!-- PROGRAMMER: replace emoji with <img src="kevin-photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%"> -->
+      <h4>Kevin — Founder</h4>
+      <p>Honest writing from the solo founder building LoveHuddle. No PR spin. Just the real story.</p>
+    </div>
+
+    <div class="widget widget-safe">
+      <div class="widget-title">Platform Safety</div>
+      <div class="safe-items">
+        <div class="safe-item"><span class="safe-check">✓</span> Identity verified profiles only</div>
+        <div class="safe-item"><span class="safe-check">✓</span> AI safety screening on every Huddle</div>
+        <div class="safe-item"><span class="safe-check">✓</span> Zero tolerance abuse policy</div>
+        <div class="safe-item"><span class="safe-check">✓</span> 24/7 Shield Protocol active</div>
+        <div class="safe-item"><span class="safe-check">✓</span> End-to-end encrypted messaging</div>
+      </div>
+      <div class="powered-by">Powered by <strong>AI-Huddle-Core™</strong></div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title">Browse Topics</div>
+      <div class="topic-list">
+        <a class="topic-item" href="#">Founder Notes <span class="topic-count">12</span></a>
+        <a class="topic-item" href="#">Dating Culture <span class="topic-count">8</span></a>
+        <a class="topic-item" href="#">Safety & Trust <span class="topic-count">5</span></a>
+        <a class="topic-item" href="#">AI & Design <span class="topic-count">7</span></a>
+        <a class="topic-item" href="#">Quizzes <span class="topic-count">4</span></a>
+        <a class="topic-item" href="#">LoveHuddle News <span class="topic-count">6</span></a>
+      </div>
+    </div>
+
+    <div class="widget widget-newsletter">
+      <div class="widget-title">Stay Close</div>
+      <h4>Get the Journal</h4>
+      <p>New posts, launch updates, founder reflections. No noise, no spam.</p>
+      <input class="nl-input" type="email" placeholder="your@email.com">
+      <button class="btn-sub">Subscribe →</button>
+    </div>
+
+  </aside>
+
+  <!-- ════════════════════════════════════
+       SINGLE POST EXAMPLE
+       (shows programmer what a full post looks like)
+  ════════════════════════════════════ -->
+  <div id="post-example" style="grid-column:1/-1; margin-top:24px;">
+    <div class="section-label">Example: What a Full Post Looks Like</div>
+
+    <div class="post-view">
+
+      <!-- POST HERO PHOTO -->
+      <div class="post-hero-img">
+        <!-- PROGRAMMER: replace with <img src="post-hero.jpg" style="width:100%;height:100%;object-fit:cover"> -->
+        <div class="post-hero-placeholder">
+          <div class="big-icon">🔥</div>
+          <p>Post hero photo goes here</p>
+        </div>
+      </div>
+
+      <div class="post-content">
+        <!-- HEADER -->
+        <div class="post-header">
+          <div class="post-category-bar">
+            <span class="post-cat-tag">Founder Notes</span>
+            <div class="post-date-rt">
+              <span>12 May 2026</span>
+              <span>·</span>
+              <span>5 min read</span>
+            </div>
+          </div>
+          <h1>Why We Burned the <em>Swipe.</em></h1>
+        </div>
+
+        <!-- AUTHOR -->
+        <div class="author-row">
+          <div class="author-avatar">👤</div>
+          <!-- PROGRAMMER: replace emoji with founder photo <img src="kevin.jpg" ...> -->
+          <div class="author-info">
+            <p>Kevin</p>
+            <span>Founder, LoveHuddle</span>
+          </div>
+        </div>
+
+        <!-- BODY TEXT -->
+        <div class="body-text">
+          <p>Swipe culture wasn't an accident. It was engineered — deliberately — to maximise time-on-app, not to help you find a real connection. Every feature was designed to keep you scrolling, not to get you off the platform.</p>
+
+          <blockquote>"The best dating app is one you delete. We're actually building for that."</blockquote>
+
+          <!-- INLINE PHOTO -->
+          <div class="inline-photo">
+            <!-- PROGRAMMER: replace with <img src="photo.jpg" alt="caption here"> -->
+            <div class="inline-photo-placeholder">
+              <span>📸</span>
+              <p>Inline photo goes here — upload via Ghost CMS editor</p>
+            </div>
+          </div>
+          <p class="photo-caption">Caption text goes here — optional</p>
+
+          <h2>What We Built Instead</h2>
+          <p>LoveHuddle runs on a simple idea: one person, one conversation, real intention. No endless gallery. No swiping. AI-Huddle-Core™ does the heavy lifting so you don't have to.</p>
+
+          <!-- VIDEO EMBED -->
+          <div class="video-embed">
+            <!-- PROGRAMMER (Ghost CMS): paste YouTube URL into embed card in editor
+                 PROGRAMMER (Next.js): use react-player or iframe below:
+                 <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+            -->
+            <div class="video-placeholder">
+              <div class="play-btn">▶</div>
+              <p>Video embed goes here — YouTube or Vimeo URL</p>
+            </div>
+          </div>
+
+          <p>Safety isn't a checkbox. It's built into every layer of how LoveHuddle works — from the moment you sign up to the moment you meet.</p>
+        </div>
+
+        <!-- SAFETY PANEL -->
+        <div class="safety-panel">
+          <div class="safety-panel-head">
+            <div class="shield-icon">🛡️</div>
+            <div>
+              <h4>LoveHuddle Safety — While You Read</h4>
+              <p>How we protect every user, every Huddle</p>
+            </div>
+          </div>
+          <div class="safety-items">
+            <div class="safety-item">
+              <div class="safety-item-icon">✅</div>
+              <div class="safety-item-text">
+                <p>Identity Verification</p>
+                <span>Every profile is verified before they can Huddle. No catfishing, no fakes.</span>
+              </div>
+            </div>
+            <div class="safety-item">
+              <div class="safety-item-icon">🧠</div>
+              <div class="safety-item-text">
+                <p>AI-Huddle-Core™ Shield Protocol</p>
+                <span>Proactive AI monitoring flags unsafe behaviour before it reaches you.</span>
+              </div>
+            </div>
+            <div class="safety-item">
+              <div class="safety-item-icon">🔒</div>
+              <div class="safety-item-text">
+                <p>End-to-End Encryption</p>
+                <span>Your conversations are private. Always. No exceptions.</span>
+              </div>
+            </div>
+            <div class="safety-item">
+              <div class="safety-item-icon">🚨</div>
+              <div class="safety-item-text">
+                <p>One-Tap Report & Block</p>
+                <span>Instant action. Our team reviews every report within 2 hours.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUIZ BLOCK -->
+        <div class="quiz-block">
+          <div class="quiz-header">
+            <div class="quiz-icon">🤔</div>
+            <div>
+              <h3>Quick Quiz</h3>
+              <p>Test what you just read</p>
+            </div>
+          </div>
+          <div class="quiz-body">
+            <div class="quiz-q">
+              <span>Question 1 of 3</span>
+              What is the main reason LoveHuddle removed the swipe mechanic?
+            </div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="selectOpt(this)">
+                <div class="opt-letter">A</div>
+                To make the app load faster
+              </div>
+              <div class="quiz-opt" onclick="selectOpt(this)">
+                <div class="opt-letter">B</div>
+                Because swipe apps are designed for engagement, not connection
+              </div>
+              <div class="quiz-opt" onclick="selectOpt(this)">
+                <div class="opt-letter">C</div>
+                To be different from competitors
+              </div>
+              <div class="quiz-opt" onclick="selectOpt(this)">
+                <div class="opt-letter">D</div>
+                It was too expensive to build
+              </div>
+            </div>
+            <button class="btn-quiz" onclick="submitQuiz()">Submit Answer</button>
+            <div class="quiz-result" id="quiz-result">
+              ✅ <strong>Correct — B.</strong> Swipe mechanics are engineered for time-on-app, not genuine connection. LoveHuddle is designed to get you off the app and into a real Huddle as fast as possible.
+            </div>
+          </div>
+        </div>
+
+        <!-- SHARE -->
+        <div class="share-row">
+          <span class="share-label">Share:</span>
+          <a class="share-btn" href="#">🔗 LinkedIn</a>
+          <a class="share-btn" href="#">𝕏 Twitter</a>
+          <a class="share-btn" href="#">📋 Copy link</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="footer-logo"><span>LOVE</span>HUDDLE</div>
+  <p>
+    © 2026 LoveHuddle Ltd. All rights reserved. Registered in England & Wales.<br>
+    <a href="#">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="#">Terms of Use</a> &nbsp;·&nbsp;
+    <a href="#">Safety Centre</a> &nbsp;·&nbsp;
+    <a href="#">Contact</a>
+  </p>
+</footer>
+
+<script>
+// ── Quiz interaction
+function selectOpt(el) {
+  document.querySelectorAll('.quiz-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function submitQuiz() {
+  const sel = document.querySelector('.quiz-opt.selected');
+  const result = document.getElementById('quiz-result');
+  if (!sel) { alert('Please select an answer.'); return; }
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts[1].classList.add('correct'); // B is correct
+  if (sel !== opts[1]) sel.classList.add('wrong');
+  result.style.display = 'block';
+  document.querySelector('.btn-quiz').disabled = true;
+}
+
+// ── Pill filter (visual only — hook to real filter logic)
+document.querySelectorAll('.pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+</script>
+
+<!--
+═══════════════════════════════════════════════════════
+  PROGRAMMER NOTES — LoveHuddle Blog
+═══════════════════════════════════════════════════════
+
+RECOMMENDED STACK:
+  CMS:      Ghost (ghost.org) — handles post editor, photo/video uploads,
+            newsletter, members/subscriptions out of the box.
+  Frontend: Next.js connected to Ghost via Content API.
+  Host:     Ghost(Pro) or self-host on VPS (DigitalOcean / Render).
+  Domain:   blog.lovehuddle.com
+
+SECURITY (anti-hack):
+  - Ghost is open source, regularly patched, battle-tested
+  - Never expose Ghost Admin on public internet — use VPN or IP whitelist
+  - Use Cloudflare in front of everything (DDoS protection, WAF, SSL)
+  - Strong admin password + 2FA on Ghost admin
+  - Keep Ghost and Node.js updated (set up automated security patches)
+  - Rate-limit newsletter signup endpoints
+  - CSP headers via Cloudflare or Next.js middleware
+
+PHOTO UPLOAD:
+  In Ghost editor: drag/drop or click "+" > Image card
+  Stores to: Ghost's built-in file storage or connect to S3/Cloudflare R2
+
+VIDEO EMBED:
+  In Ghost editor: click "+" > Embed card > paste YouTube or Vimeo URL
+  Ghost auto-renders the iframe. No code needed.
+
+QUIZ:
+  Option A (simple): Use Typeform embed — paste embed code into Ghost HTML card
+  Option B (custom): Build React quiz component in Next.js, render in post template
+  Option C (no-code): Outgrow.co or involve.me — paste embed code
+
+NEWSLETTER:
+  Ghost has built-in newsletter + paid memberships.
+  Or connect to Mailchimp / ConvertKit via Zapier.
+
+SAFETY PANEL:
+  This is a custom HTML card in Ghost. Copy the .safety-panel HTML
+  into a Ghost HTML card in the post editor.
+
+CSS VARIABLES (top of this file) → copy into your global stylesheet.
+
+═══════════════════════════════════════════════════════
+-->
+
+</body>
+</html>

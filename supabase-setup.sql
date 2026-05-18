@@ -23,6 +23,11 @@ ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS video_embed_url TEXT;
 ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT true;
 ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
+-- 1b2. Journal layout migration (category tag + featured flag for the new design)
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS category VARCHAR(100) DEFAULT 'Founder Notes';
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false;
+UPDATE blog_posts SET category = 'Founder Notes' WHERE category IS NULL OR category = '';
+
 -- Backfill slugs for existing rows (lowercase, hyphenated, alphanumeric)
 UPDATE blog_posts
 SET slug = TRIM(BOTH '-' FROM REGEXP_REPLACE(

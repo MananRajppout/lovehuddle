@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { supabase } from './supabaseClient';
 import AdminLogin from './AdminLogin';
-import { slugify, mdComponents } from './Blog';
+import { slugify, mdComponents, BLOG_CATEGORIES } from './Blog';
 import './Admin.css';
 import './Blog.css';
 
@@ -15,6 +15,7 @@ const BLOCK_TEMPLATES = {
   gallery: '\n\n```gallery\nhttps://image-url-1.jpg | Optional caption\nhttps://image-url-2.jpg | Optional caption\nhttps://image-url-3.jpg\n```\n\n',
   callout: '\n\n```callout\nA highlighted thought you want the reader to sit with for a moment.\n```\n\n',
   quiz: '\n\n```quiz\nWhat matters most to you in a connection?\n- Honesty above all\n- Shared sense of humour\n- Being deeply seen\n- Quiet companionship\nResult: There is no wrong answer — but the way you answer says something about how you might show up on LoveHuddle.\n```\n\n',
+  safety: '\n\n```safety\nTitle: LoveHuddle Safety — While You Read\nSubtitle: How we protect every user, every Huddle\n- ✅ Identity Verification | Every profile is verified before they can Huddle.\n- 🧠 AI-Huddle-Core™ Shield | Proactive AI monitoring flags unsafe behaviour.\n- 🔒 End-to-End Encryption | Your conversations are private. Always.\n- 🚨 One-Tap Report & Block | Instant action, reviewed within 2 hours.\n```\n\n',
 };
 
 /* ─── Simple hash function (mirrors AdminLogin) ─── */
@@ -59,6 +60,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     const [coverImageUrl, setCoverImageUrl] = useState('');
     const [metaDescription, setMetaDescription] = useState('');
     const [videoEmbedUrl, setVideoEmbedUrl] = useState('');
+    const [category, setCategory] = useState('Founder Notes');
+    const [featured, setFeatured] = useState(false);
     const [published, setPublished] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
@@ -170,6 +173,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         setCoverImageUrl('');
         setMetaDescription('');
         setVideoEmbedUrl('');
+        setCategory('Founder Notes');
+        setFeatured(false);
         setPublished(true);
         setShowPreview(false);
     };
@@ -191,6 +196,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             cover_image_url: coverImageUrl.trim(),
             meta_description: metaDescription.trim(),
             video_embed_url: videoEmbedUrl.trim(),
+            category,
+            featured,
             published,
         };
 
@@ -263,6 +270,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         setCoverImageUrl(post.cover_image_url || '');
         setMetaDescription(post.meta_description || '');
         setVideoEmbedUrl(post.video_embed_url || '');
+        setCategory(post.category || 'Founder Notes');
+        setFeatured(post.featured === true);
         setPublished(post.published !== false);
         setActiveTab('articles');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -421,6 +430,18 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                 </div>
 
                                 <div className="input-group">
+                                    <label>Category <span className="char-count">colours the post tag on /blog</span></label>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                    >
+                                        {BLOG_CATEGORIES.map((c) => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="input-group">
                                     <label>Cover image</label>
                                     {coverImageUrl && (
                                         <div className="admin-cover-preview">
@@ -480,6 +501,9 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                         <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.quiz)}>
                                             <span aria-hidden="true">◎</span> Quiz
                                         </button>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.safety)}>
+                                            <span aria-hidden="true">🛡</span> Safety panel
+                                        </button>
                                         <label className={`admin-block-btn admin-block-upload ${uploading ? 'is-uploading' : ''}`}>
                                             <span aria-hidden="true">📷</span> {uploading ? 'Uploading…' : 'Upload image'}
                                             <input
@@ -536,6 +560,17 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                     <label className="admin-toggle">
                                         <input
                                             type="checkbox"
+                                            checked={featured}
+                                            onChange={(e) => setFeatured(e.target.checked)}
+                                        />
+                                        <span>Featured (pin to the top of /blog)</span>
+                                    </label>
+                                </div>
+
+                                <div className="input-group admin-toggle-row">
+                                    <label className="admin-toggle">
+                                        <input
+                                            type="checkbox"
                                             checked={published}
                                             onChange={(e) => setPublished(e.target.checked)}
                                         />
@@ -560,25 +595,36 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                 </div>
                             </form>
 
-                            {/* Preview — renders with the real Blog renderers so the founder sees exactly what he'll publish */}
+                            {/* Preview — renders inside .blog-theme so it matches the published post exactly */}
                             {showPreview && content.trim() && (
                                 <div className="admin-preview">
                                     <h4>Live Preview</h4>
-                                    <div className="admin-preview-content blog-article-body">
-                                        {coverImageUrl && (
-                                            <div className="admin-preview-cover">
-                                                <img src={coverImageUrl} alt="" />
+                                    <div className="blog-theme admin-preview-theme">
+                                        <div className="post-view admin-preview-card">
+                                            {coverImageUrl && (
+                                                <div className="post-hero-img">
+                                                    <img src={coverImageUrl} alt="" />
+                                                </div>
+                                            )}
+                                            <div className="post-content">
+                                                <header className="post-header">
+                                                    <div className="post-category-bar">
+                                                        <span className="post-cat-tag">{category}</span>
+                                                        <div className="post-date-rt">
+                                                            <span>
+                                                                {editingPost ? editingPost.date : new Date().toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <h1>{title || 'Untitled'}</h1>
+                                                    {subtitle && <p className="post-subtitle">{subtitle}</p>}
+                                                </header>
+                                                <div className="body-text">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                                                        {content}
+                                                    </ReactMarkdown>
+                                                </div>
                                             </div>
-                                        )}
-                                        <div className="article-date">
-                                            {editingPost ? editingPost.date : new Date().toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </div>
-                                        <h3>{title || 'Untitled'}</h3>
-                                        {subtitle && <p className="admin-preview-subtitle">{subtitle}</p>}
-                                        <div className="admin-preview-markdown">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                                                {content}
-                                            </ReactMarkdown>
                                         </div>
                                     </div>
                                 </div>

@@ -693,6 +693,22 @@
     background: rgba(0, 0, 0, 0.4);
 }
 
+.admin-preview-theme {
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 1rem;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.admin-preview-theme .admin-preview-card {
+    margin: 0;
+    border-radius: 0;
+}
+
+.admin-preview-theme .post-hero-img {
+    height: 220px;
+}
+
 /* ─── Block-insert toolbar ─── */
 .admin-block-toolbar {
     display: flex;

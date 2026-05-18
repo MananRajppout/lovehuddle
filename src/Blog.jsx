@@ -591,7 +591,7 @@ export function BlogIndex({ fallbackPosts = [] }) {
     <div className="blog-theme">
       <div className="blog-hero">
         <p className="hero-eyebrow">✦ The LoveHuddle Journal</p>
-        <h1>Social/Dating, <em>Differently.</em><br />Written Honestly.</h1>
+        <h1>Social &amp; Dating, <em>Rebuilt for Real Connection.</em></h1>
         <p>Founder thoughts, dating culture, safety insights, and how we're building something that actually works.</p>
         <div className="hero-search">
           <input

@@ -12,6 +12,7 @@ import TermsOfService from './TermsOfService';
 import Safety from './Safety';
 import CookiePolicy from './CookiePolicy';
 import Contact from './Contact';
+import { BlogIndex, BlogPost, slugify } from './Blog';
 
 /* ─── Scroll-reveal hook ─── */
 function useReveal() {
@@ -148,7 +149,7 @@ function LaunchAnnounce() {
 }
 
 /* ─── Landing Page Component ─── */
-function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
+function Landing({ blogPosts, onJoinWaitlist }) {
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
 
@@ -160,28 +161,6 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
       setEmail('');
     }
   };
-
-  /* ── Open blog: push a history entry so Back closes the modal ── */
-  const openBlog = (post) => {
-    setActiveBlog(post);
-    window.history.pushState({ blog: true }, '');
-  };
-
-  /* ── Close blog: go back in history to pop the entry we pushed ── */
-  const closeBlog = () => {
-    if (activeBlog) {
-      window.history.back();   // triggers popstate → clears activeBlog
-    }
-  };
-
-  /* ── Listen for browser Back button to close the modal ── */
-  useEffect(() => {
-    const onPopState = () => {
-      setActiveBlog(null);
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, [setActiveBlog]);
 
   return (
     <>
@@ -327,19 +306,30 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
         </div>
       </section>
 
-      {/* Articles Section */}
+      {/* Articles Section — preview of latest journal posts */}
       <section id="articles" className="section-container">
         <RevealSection>
-          <h2 className="section-title">LoveHuddle <span className="gradient-text">Articles</span></h2>
+          <h2 className="section-title">LoveHuddle <span className="gradient-text">Journal</span></h2>
           <div className="articles-grid">
-            {blogPosts.map((post, i) => (
-              <div key={post.id} className="article-card" style={{ animationDelay: `${i * 0.1}s` }} onClick={() => openBlog(post)}>
-                <div className="article-date">{post.date}</div>
-                <h3>{post.title}</h3>
-                <p>{post.excerpt}</p>
-                <span className="read-more">Read Article →</span>
-              </div>
-            ))}
+            {blogPosts.filter(p => p.published !== false).slice(0, 3).map((post, i) => {
+              const slug = post.slug || slugify(post.title);
+              return (
+                <Link
+                  key={post.id}
+                  to={`/blog/${slug}`}
+                  className="article-card"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <div className="article-date">{post.date}</div>
+                  <h3>{post.title}</h3>
+                  <p>{post.subtitle || post.excerpt}</p>
+                  <span className="read-more">Read Article →</span>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="articles-cta">
+            <Link to="/blog" className="btn-secondary-link">View all stories →</Link>
           </div>
         </RevealSection>
       </section>
@@ -364,148 +354,16 @@ function Landing({ blogPosts, activeBlog, setActiveBlog, onJoinWaitlist }) {
       </section>
 
 
-      {/* Blog Modal */}
-      {activeBlog && (
-        <div className="modal-overlay" onClick={closeBlog}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="close-btn" onClick={closeBlog}>&times;</button>
-            <div className="article-date">{activeBlog.date}</div>
-            <h2>{activeBlog.title}</h2>
-            <div className="article-body">
-              {activeBlog.content.split('\n\n').map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
 
-/* ─── Default blog posts ─── */
-const DEFAULT_BLOG_POSTS = [
-  {
-    id: 0,
-    title: "Why I'm Building a Dating Platform Without Swiping or Paywalls",
-    excerpt: "Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional.",
-    content: `Dating apps were created to help people connect — but somewhere along the way, they became noisy, rushed, and transactional. Swipe left, swipe right, repeat. Paywalls everywhere. Matches that go nowhere. Conversations that never start. It's a system built for speed, not for people.
-
-Living here in Wales, I've seen the same frustration that many adults across the UK feel: dating apps have become exhausting. They push you to scroll, judge quickly, and move on even faster. They're designed to keep you hooked, not to help you meet someone meaningful.
-
-So I decided to build something different.
-
-LoveHuddle is a new kind of dating platform — a calm, human‑centred alternative for adults who want real connection without the pressure. No swiping. No paywalls. No tricks. Just a slower, more intentional way to meet someone who genuinely fits your life.
-
-The problem with swiping
-
-Swiping looks simple, but it creates a fast, disposable mindset. You're encouraged to make instant decisions based on a photo and a split‑second reaction. It's addictive, but it's not meaningful.
-
-LoveHuddle removes swiping entirely. Instead of chasing matches, you build connection through small, thoughtful daily questions — simple prompts that help people open up naturally. Not interviews. Not forms. Just real conversation, one step at a time.
-
-Why there are no paywalls
-
-Most dating apps hide the best features behind subscriptions. Want to see who liked you? Pay. Want to message someone? Pay. Want to boost your profile? Pay again.
-
-LoveHuddle is different. There are no hidden fees and no premium tiers. Everyone gets the same experience. Everyone has the same chance to connect. Because connection shouldn't be something you have to unlock.
-
-A calmer, more human way to meet people
-
-LoveHuddle is built for adults who want something real — people who are tired of the noise, the pressure, and the endless scrolling. It's for those who value depth over speed, honesty over performance, and conversation over algorithms.
-
-This platform is being built intentionally, step by step, with a simple mission: Create a space where adults can connect without being rushed, pushed, or sold to.
-
-If that resonates with you, you're in the right place. LoveHuddle is for people who want connection that feels human again — and this is just the beginning.`,
-    date: "Feb 24, 2026"
-  },
-  {
-    id: 4,
-    title: "Shortlisted Before Launch: LoveHuddle Makes the Wales StartUp Awards 2026",
-    excerpt: "Before a single line of code was written, LoveHuddle was officially shortlisted for Innovative StartUp of the Year at the Wales StartUp Awards 2026.",
-    content: `There's a moment every founder dreams about — the moment someone outside your own head believes in what you're building.
-
-For LoveHuddle, that moment came early. Before our platform was built. Before our app existed. Before we had even written a single line of production code.
-
-In early 2026, LoveHuddle was officially shortlisted for the Wales StartUp Awards 2026 in the category of Innovative StartUp of the Year.
-
-Let that sink in for a moment.
-
-A solo-founded startup, conceived and built in South Wales, was recognised on a national stage — not because of millions in funding or a team of fifty engineers — but because of an idea. A vision. A refusal to accept that the dating app industry couldn't be done better.
-
-What does this mean?
-
-This shortlisting is more than an award nomination. It's validation. It tells us that the world is ready for something different. That people — judges, industry professionals, entrepreneurs — can see the gap in the market that we've been talking about.
-
-Dating apps have been broken for years. Swipe culture, paywalls, bots, fake profiles, endless subscriptions. LoveHuddle set out to tear all of that down and replace it with something genuinely human.
-
-And before we even launched, the Welsh startup community agreed.
-
-Why Wales?
-
-Wales often gets overlooked in the UK tech conversation. The spotlight usually falls on London, Manchester, or Edinburgh. But some of the most innovative thinking in the UK is happening right here — in communities that understand people, that value authenticity, and that build things that matter.
-
-LoveHuddle was always going to be built here. Not because of circumstance, but by design. We believe that the future of tech doesn't belong to Silicon Valley. It belongs to communities. And this shortlisting proves that Welsh innovation can compete on any stage.
-
-What's next?
-
-We're now in active development. The platform is being built. The waitlist is growing. Late Summer Launch 2026 is the target.
-
-This shortlisting lights a fire under everything we're doing. It's a reminder that the idea was always worth fighting for — and now, it's time to build it.
-
-If you haven't joined the waiting list yet, now is the time. Be part of something that was recognised as innovative before it even launched.`,
-    date: "Apr 1, 2026"
-  },
-  {
-    id: 0,
-    title: "The Death of the Algorithm",
-    excerpt: "Why swiping is killing human connection and how we're fixing it.",
-    content: `For too long, our social lives have been dictated by algorithms designed to keep us scrolling rather than meeting. LoveHuddle is stripping away the digital barriers to bring back genuine human moments.
-
-The dating industry has become a machine — one that profits from loneliness, not from love. Every time you swipe, you feed the algorithm. Every paywall you encounter is designed to exploit your desire for connection.
-
-We believe that meaningful relationships start with meaningful conversations. Not with a split-second swipe based on a heavily filtered photo.
-
-LoveHuddle's approach is fundamentally different. We're building technology that gets out of the way — that facilitates real human interaction rather than replacing it with an addictive digital substitute.
-
-Stay tuned for more updates as we approach the build phase in March 2026.`,
-    date: "Feb 24, 2026"
-  },
-  {
-    id: 2,
-    title: "Built in Wales, for the UK",
-    excerpt: "The journey of a solo founder disrupting Silicon Valley.",
-    content: `Tech doesn't just belong to big corporations in California. LoveHuddle is architected in Wales, built with the UK community at its heart. We believe in ethical, local impact over distant profit.
-
-The UK dating scene deserves better than recycled Silicon Valley products. We deserve platforms that understand our culture, our values, and our way of life.
-
-As a solo founder based in Wales, I've seen firsthand how technology can either bring communities together or tear them apart. LoveHuddle is my answer to the question: what would a dating platform look like if it were built by someone who actually cared about the people using it?
-
-Every design decision, every feature, every policy is made with one question in mind: does this help real people make real connections?
-
-Stay tuned for more updates as we approach the build phase in March 2026.`,
-    date: "Feb 20, 2026"
-  },
-  {
-    id: 3,
-    title: "The Late Summer Launch 2026 Vision",
-    excerpt: "What to expect when we launch nationally.",
-    content: `Launching a platform without paywalls is a bold move. Here is the roadmap for how we will reach every corner of the UK by Late Summer Launch 2026, ensuring safety and authenticity with every connection.
-
-Our vision is simple but ambitious: create the UK's most trusted, most human dating platform — one that puts people before profit.
-
-Phase 1 is our closed beta, where our founding 500 members will shape the platform's future. Phase 2 expands to major UK cities. Phase 3 is the full national rollout.
-
-At every stage, safety comes first. Our one-time verification process ensures that every person on LoveHuddle is exactly who they say they are.
-
-Stay tuned for more updates as we approach the build phase in March 2026.`,
-    date: "Feb 15, 2026"
-  }
-];
+/* ─── Default blog posts (empty — content is managed via /admin and stored in Supabase) ─── */
+const DEFAULT_BLOG_POSTS = [];
 
 /* ─── Main App with Router ─── */
 function App() {
   const [waitlist, setWaitlist] = useState([]);
-  const [activeBlog, setActiveBlog] = useState(null);
   const [blogPosts, setBlogPosts] = useState(DEFAULT_BLOG_POSTS);
 
   /* ── Fetch blog posts from Supabase on mount ── */
@@ -552,37 +410,57 @@ function App() {
 
   const addPost = async (newPost) => {
     try {
+      const payload = {
+        title: newPost.title,
+        slug: newPost.slug || slugify(newPost.title),
+        subtitle: newPost.subtitle || null,
+        excerpt: newPost.excerpt,
+        content: newPost.content,
+        cover_image_url: newPost.cover_image_url || null,
+        meta_description: newPost.meta_description || null,
+        video_embed_url: newPost.video_embed_url || null,
+        published: newPost.published !== false,
+        date: newPost.date,
+      };
       const { data, error } = await supabase
         .from('blog_posts')
-        .insert([{
-          title: newPost.title,
-          excerpt: newPost.excerpt,
-          content: newPost.content,
-          date: newPost.date
-        }])
+        .insert([payload])
         .select()
         .single();
       if (!error && data) setBlogPosts(prev => [data, ...prev]);
+      if (error) throw error;
+      return { data, error };
     } catch (err) {
       console.error('Failed to add post:', err);
+      return { error: err };
     }
   };
 
   const editPost = async (updatedPost) => {
     try {
+      const payload = {
+        title: updatedPost.title,
+        slug: updatedPost.slug || slugify(updatedPost.title),
+        subtitle: updatedPost.subtitle || null,
+        excerpt: updatedPost.excerpt,
+        content: updatedPost.content,
+        cover_image_url: updatedPost.cover_image_url || null,
+        meta_description: updatedPost.meta_description || null,
+        video_embed_url: updatedPost.video_embed_url || null,
+        published: updatedPost.published !== false,
+      };
       const { data, error } = await supabase
         .from('blog_posts')
-        .update({
-          title: updatedPost.title,
-          excerpt: updatedPost.excerpt,
-          content: updatedPost.content
-        })
+        .update(payload)
         .eq('id', updatedPost.id)
         .select()
         .single();
       if (!error && data) setBlogPosts(prev => prev.map(p => p.id === data.id ? data : p));
+      if (error) throw error;
+      return { data, error };
     } catch (err) {
       console.error('Failed to edit post:', err);
+      return { error: err };
     }
   };
 
@@ -609,7 +487,7 @@ function App() {
               <a href="/#disruption">The Disruption</a>
               <a href="/#roadmap">The Roadmap</a>
               <a href="/#achievements">Achievements</a>
-              <a href="/#articles">Articles</a>
+              <Link to="/blog">Blog</Link>
               <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
             </div>
           </div>
@@ -618,7 +496,9 @@ function App() {
 
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Landing blogPosts={blogPosts} activeBlog={activeBlog} setActiveBlog={setActiveBlog} onJoinWaitlist={addToWaitlist} />} />
+        <Route path="/" element={<Landing blogPosts={blogPosts} onJoinWaitlist={addToWaitlist} />} />
+        <Route path="/blog" element={<BlogIndex fallbackPosts={blogPosts} />} />
+        <Route path="/blog/:slug" element={<BlogPost fallbackPosts={blogPosts} />} />
         <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onEditPost={editPost} onDeletePost={deletePost} waitlist={waitlist} />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
@@ -639,7 +519,7 @@ function App() {
               <h4>Platform</h4>
               <Link to="/#disruption">The Disruption</Link>
               <Link to="/#roadmap">The Roadmap</Link>
-              <Link to="/#articles">Articles</Link>
+              <Link to="/blog">Blog</Link>
             </div>
             <div className="footer-col">
               <h4>Legal &amp; Info</h4>

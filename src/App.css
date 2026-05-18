@@ -1626,6 +1626,22 @@
   margin-top: 3rem;
 }
 
+.articles-cta {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.articles-cta .btn-secondary-link {
+  font-size: 0.95rem;
+}
+
+a.article-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .article-card {
   padding: 2.5rem;
   border-radius: 20px;

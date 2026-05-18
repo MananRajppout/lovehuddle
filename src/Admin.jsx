@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { supabase } from './supabaseClient';
 import AdminLogin from './AdminLogin';
+import { slugify, mdComponents } from './Blog';
 import './Admin.css';
+import './Blog.css';
+
+/* ─── Templates inserted by the "Add block" toolbar ─── */
+const BLOCK_TEMPLATES = {
+  qa: '\n\n```qa\nQ: Replace with your question.\nA: Replace with your answer.\n\nQ: Add another question?\nA: …and another answer.\n```\n\n',
+  quote: '\n\n```quote\nA short, memorable line worth pausing on.\n— Optional attribution\n```\n\n',
+  gallery: '\n\n```gallery\nhttps://image-url-1.jpg | Optional caption\nhttps://image-url-2.jpg | Optional caption\nhttps://image-url-3.jpg\n```\n\n',
+  callout: '\n\n```callout\nA highlighted thought you want the reader to sit with for a moment.\n```\n\n',
+  quiz: '\n\n```quiz\nWhat matters most to you in a connection?\n- Honesty above all\n- Shared sense of humour\n- Being deeply seen\n- Quiet companionship\nResult: There is no wrong answer — but the way you answer says something about how you might show up on LoveHuddle.\n```\n\n',
+};
 
 /* ─── Simple hash function (mirrors AdminLogin) ─── */
 async function hashString(str) {
@@ -37,11 +51,78 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
 
     /* ── Blog form state ── */
     const [title, setTitle] = useState('');
+    const [slug, setSlug] = useState('');
+    const [slugTouched, setSlugTouched] = useState(false);
+    const [subtitle, setSubtitle] = useState('');
     const [excerpt, setExcerpt] = useState('');
     const [content, setContent] = useState('');
+    const [coverImageUrl, setCoverImageUrl] = useState('');
+    const [metaDescription, setMetaDescription] = useState('');
+    const [videoEmbedUrl, setVideoEmbedUrl] = useState('');
+    const [published, setPublished] = useState(true);
+    const [uploading, setUploading] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+    /* ── Auto-generate slug from title until user edits it ── */
+    useEffect(() => {
+        if (!slugTouched) setSlug(slugify(title));
+    }, [title, slugTouched]);
+
+    /* ── Content textarea ref + cursor-aware insert ── */
+    const contentRef = useRef(null);
+    const insertAtCursor = (text) => {
+        const ta = contentRef.current;
+        if (!ta) {
+            setContent(prev => (prev ? prev + text : text));
+            return;
+        }
+        const start = ta.selectionStart ?? content.length;
+        const end = ta.selectionEnd ?? content.length;
+        const next = content.slice(0, start) + text + content.slice(end);
+        setContent(next);
+        requestAnimationFrame(() => {
+            ta.focus();
+            const pos = start + text.length;
+            ta.setSelectionRange(pos, pos);
+        });
+    };
+
+    /* ── Upload an image directly into the article body ── */
+    const handleInlineImageUpload = async (file) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('Please choose an image file.', 'error');
+            return;
+        }
+        if (file.size > 8 * 1024 * 1024) {
+            showToast('Image must be under 8MB.', 'error');
+            return;
+        }
+        setUploading(true);
+        try {
+            const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error: uploadError } = await supabase.storage
+                .from('blog-images')
+                .upload(safeName, file, {
+                    cacheControl: '31536000',
+                    upsert: false,
+                    contentType: file.type,
+                });
+            if (uploadError) throw uploadError;
+            const { data: publicUrl } = supabase.storage
+                .from('blog-images')
+                .getPublicUrl(safeName);
+            insertAtCursor(`\n\n![Describe this image](${publicUrl.publicUrl})\n\n`);
+            showToast('Image added to your article.');
+        } catch (err) {
+            const msg = err?.message || 'Upload failed.';
+            showToast(msg.includes('bucket') ? 'Storage bucket "blog-images" missing — run the latest supabase-setup.sql in Supabase.' : msg, 'error');
+        }
+        setUploading(false);
+    };
 
     /* ── Password change state ── */
     const [currentPass, setCurrentPass] = useState('');
@@ -78,51 +159,118 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         setIsAuthenticated(false);
     };
 
+    /* ── Reset all blog form fields ── */
+    const resetForm = () => {
+        setTitle('');
+        setSlug('');
+        setSlugTouched(false);
+        setSubtitle('');
+        setExcerpt('');
+        setContent('');
+        setCoverImageUrl('');
+        setMetaDescription('');
+        setVideoEmbedUrl('');
+        setPublished(true);
+        setShowPreview(false);
+    };
+
     /* ── Submit blog post (create or edit) ── */
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title.trim() || !content.trim()) return;
 
-        if (editingPost) {
-            onEditPost({
-                ...editingPost,
-                title: title.trim(),
-                excerpt: excerpt.trim() || content.trim().substring(0, 100) + '...',
-                content: content.trim()
-            });
+        const finalSlug = (slug.trim() || slugify(title)).trim();
+        const finalExcerpt = excerpt.trim() || subtitle.trim() || content.trim().replace(/[#*_`>]/g, '').substring(0, 160).trim() + '…';
+
+        const payload = {
+            title: title.trim(),
+            slug: finalSlug,
+            subtitle: subtitle.trim(),
+            excerpt: finalExcerpt,
+            content: content.trim(),
+            cover_image_url: coverImageUrl.trim(),
+            meta_description: metaDescription.trim(),
+            video_embed_url: videoEmbedUrl.trim(),
+            published,
+        };
+
+        try {
+            if (editingPost) {
+                const result = await onEditPost({ ...editingPost, ...payload });
+                if (result && result.error) throw result.error;
+                showToast('Article updated successfully!');
+            } else {
+                const result = await onAddPost({
+                    id: Date.now(),
+                    ...payload,
+                    date: new Date().toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' }),
+                });
+                if (result && result.error) throw result.error;
+                showToast('Article published successfully!');
+            }
             setEditingPost(null);
-            showToast('Article updated successfully!');
-        } else {
-            onAddPost({
-                id: Date.now(),
-                title: title.trim(),
-                excerpt: excerpt.trim() || content.trim().substring(0, 100) + '...',
-                content: content.trim(),
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            });
-            showToast('Article published successfully!');
+            resetForm();
+        } catch (err) {
+            const msg = err?.message || 'Failed to save article.';
+            showToast(msg.includes('duplicate') ? 'That slug already exists. Choose another.' : msg, 'error');
         }
-        setTitle('');
-        setExcerpt('');
-        setContent('');
-        setShowPreview(false);
+    };
+
+    /* ── Image upload (Supabase Storage → blog-images bucket) ── */
+    const handleImageUpload = async (file, setter) => {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('Please choose an image file.', 'error');
+            return;
+        }
+        if (file.size > 8 * 1024 * 1024) {
+            showToast('Image must be under 8MB.', 'error');
+            return;
+        }
+        setUploading(true);
+        try {
+            const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error: uploadError } = await supabase.storage
+                .from('blog-images')
+                .upload(safeName, file, {
+                    cacheControl: '31536000',
+                    upsert: false,
+                    contentType: file.type,
+                });
+            if (uploadError) throw uploadError;
+            const { data: publicUrl } = supabase.storage
+                .from('blog-images')
+                .getPublicUrl(safeName);
+            setter(publicUrl.publicUrl);
+            showToast('Image uploaded.');
+        } catch (err) {
+            const msg = err?.message || 'Upload failed.';
+            showToast(msg.includes('bucket') ? 'Storage bucket "blog-images" missing — run the latest supabase-setup.sql in Supabase.' : msg, 'error');
+        }
+        setUploading(false);
     };
 
     /* ── Start editing ── */
     const startEdit = (post) => {
         setEditingPost(post);
-        setTitle(post.title);
-        setExcerpt(post.excerpt);
-        setContent(post.content);
+        setTitle(post.title || '');
+        setSlug(post.slug || slugify(post.title || ''));
+        setSlugTouched(true);
+        setSubtitle(post.subtitle || '');
+        setExcerpt(post.excerpt || '');
+        setContent(post.content || '');
+        setCoverImageUrl(post.cover_image_url || '');
+        setMetaDescription(post.meta_description || '');
+        setVideoEmbedUrl(post.video_embed_url || '');
+        setPublished(post.published !== false);
         setActiveTab('articles');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const cancelEdit = () => {
         setEditingPost(null);
-        setTitle('');
-        setExcerpt('');
-        setContent('');
+        resetForm();
     };
 
     /* ── Delete with confirmation ── */
@@ -239,33 +387,160 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <h3>{editingPost ? 'Edit Article' : 'Create New Article'}</h3>
                             <form className="admin-form" onSubmit={handleSubmit}>
                                 <div className="input-group">
-                                    <label>Title</label>
+                                    <label>Title <span className="char-count">required</span></label>
                                     <input
                                         type="text"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="Article Title"
+                                        placeholder="Article title"
                                         required
                                     />
                                 </div>
+
                                 <div className="input-group">
-                                    <label>Excerpt (Optional)</label>
+                                    <label>
+                                        URL slug
+                                        <span className="char-count">/blog/{slug || 'auto-generated'}</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={slug}
+                                        onChange={(e) => { setSlugTouched(true); setSlug(e.target.value); }}
+                                        placeholder="auto-generated from title"
+                                    />
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Subtitle (optional)</label>
+                                    <input
+                                        type="text"
+                                        value={subtitle}
+                                        onChange={(e) => setSubtitle(e.target.value)}
+                                        placeholder="A short, evocative line shown under the title"
+                                    />
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Cover image</label>
+                                    {coverImageUrl && (
+                                        <div className="admin-cover-preview">
+                                            <img src={coverImageUrl} alt="Cover preview" />
+                                            <button type="button" className="btn-secondary" onClick={() => setCoverImageUrl('')}>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="admin-upload-row">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleImageUpload(e.target.files?.[0], setCoverImageUrl)}
+                                            disabled={uploading}
+                                        />
+                                        <input
+                                            type="url"
+                                            value={coverImageUrl}
+                                            onChange={(e) => setCoverImageUrl(e.target.value)}
+                                            placeholder="…or paste an image URL"
+                                        />
+                                    </div>
+                                    {uploading && <p className="admin-help">Uploading…</p>}
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Video embed URL (optional)</label>
+                                    <input
+                                        type="url"
+                                        value={videoEmbedUrl}
+                                        onChange={(e) => setVideoEmbedUrl(e.target.value)}
+                                        placeholder="YouTube or Vimeo URL — appears under the title"
+                                    />
+                                </div>
+
+                                <div className="input-group">
+                                    <label>
+                                        Content
+                                        <span className="char-count">{content.length} chars</span>
+                                    </label>
+
+                                    <div className="admin-block-toolbar" role="toolbar" aria-label="Insert a content block">
+                                        <span className="admin-block-toolbar-label">Add a block:</span>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.qa)}>
+                                            <span aria-hidden="true">💬</span> Q&amp;A
+                                        </button>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.quote)}>
+                                            <span aria-hidden="true">❝</span> Pull quote
+                                        </button>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.gallery)}>
+                                            <span aria-hidden="true">🖼</span> Photo gallery
+                                        </button>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.callout)}>
+                                            <span aria-hidden="true">✦</span> Callout
+                                        </button>
+                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.quiz)}>
+                                            <span aria-hidden="true">◎</span> Quiz
+                                        </button>
+                                        <label className={`admin-block-btn admin-block-upload ${uploading ? 'is-uploading' : ''}`}>
+                                            <span aria-hidden="true">📷</span> {uploading ? 'Uploading…' : 'Upload image'}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    handleInlineImageUpload(e.target.files?.[0]);
+                                                    e.target.value = '';
+                                                }}
+                                                disabled={uploading}
+                                                hidden
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <textarea
+                                        ref={contentRef}
+                                        value={content}
+                                        onChange={(e) => setContent(e.target.value)}
+                                        placeholder={'Start writing your story.\n\nUse the buttons above to add Q&A, photo galleries, pull quotes, callouts or a quiz — they drop in pre-filled templates you can type over.\n\nFor a heading, start a line with ##\nFor a subheading, use ###\nFor a divider, use ---\n\nLeave a blank line between paragraphs.'}
+                                        rows="16"
+                                        required
+                                    ></textarea>
+                                    <p className="admin-help">
+                                        Click an "Add a block" button above to insert a Q&amp;A, pull quote, photo gallery, callout or quiz — just type over the placeholder text. "Upload image" drops a picture straight into your story at the cursor.
+                                    </p>
+                                </div>
+
+                                <div className="input-group">
+                                    <label>Excerpt (optional, used on card)</label>
                                     <input
                                         type="text"
                                         value={excerpt}
                                         onChange={(e) => setExcerpt(e.target.value)}
-                                        placeholder="Short summary for the card"
+                                        placeholder="Short summary for the article card (auto-filled if empty)"
                                     />
                                 </div>
+
                                 <div className="input-group">
-                                    <label>Content <span className="char-count">{content.length} characters</span></label>
-                                    <textarea
-                                        value={content}
-                                        onChange={(e) => setContent(e.target.value)}
-                                        placeholder="Write the full article here...&#10;&#10;Use double line breaks to separate paragraphs."
-                                        rows="10"
-                                        required
-                                    ></textarea>
+                                    <label>
+                                        Meta description (SEO)
+                                        <span className="char-count">{metaDescription.length}/160</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={metaDescription}
+                                        onChange={(e) => setMetaDescription(e.target.value)}
+                                        placeholder="Shown in Google search results. Keep under 160 characters."
+                                        maxLength={300}
+                                    />
+                                </div>
+
+                                <div className="input-group admin-toggle-row">
+                                    <label className="admin-toggle">
+                                        <input
+                                            type="checkbox"
+                                            checked={published}
+                                            onChange={(e) => setPublished(e.target.checked)}
+                                        />
+                                        <span>Published (visible at /blog)</span>
+                                    </label>
                                 </div>
 
                                 <div className="admin-form-actions">
@@ -279,24 +554,32 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                             Cancel Editing
                                         </button>
                                     )}
-                                    <button type="submit" className="btn-primary">
-                                        {editingPost ? 'Update Article' : 'Publish Article'}
+                                    <button type="submit" className="btn-primary" disabled={uploading}>
+                                        {editingPost ? 'Update Article' : (published ? 'Publish Article' : 'Save Draft')}
                                     </button>
                                 </div>
                             </form>
 
-                            {/* Preview */}
+                            {/* Preview — renders with the real Blog renderers so the founder sees exactly what he'll publish */}
                             {showPreview && content.trim() && (
                                 <div className="admin-preview">
-                                    <h4>Preview</h4>
-                                    <div className="admin-preview-content">
+                                    <h4>Live Preview</h4>
+                                    <div className="admin-preview-content blog-article-body">
+                                        {coverImageUrl && (
+                                            <div className="admin-preview-cover">
+                                                <img src={coverImageUrl} alt="" />
+                                            </div>
+                                        )}
                                         <div className="article-date">
-                                            {editingPost ? editingPost.date : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            {editingPost ? editingPost.date : new Date().toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}
                                         </div>
                                         <h3>{title || 'Untitled'}</h3>
-                                        {content.split('\n\n').map((para, i) => (
-                                            <p key={i}>{para}</p>
-                                        ))}
+                                        {subtitle && <p className="admin-preview-subtitle">{subtitle}</p>}
+                                        <div className="admin-preview-markdown">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                                                {content}
+                                            </ReactMarkdown>
+                                        </div>
                                     </div>
                                 </div>
                             )}

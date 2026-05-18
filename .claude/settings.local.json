@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(Get-ChildItem -Path d:\\\\lovehuddle\\\\public -Force)",
+      "Bash(Select-Object Name, Length)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(powershell -Command \"\\(Get-Content 'd:\\\\lovehuddle\\\\src\\\\Admin.css' | Measure-Object -Line\\).Lines\")"
     ]
   }
 }

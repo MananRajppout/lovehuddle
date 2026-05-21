@@ -1560,12 +1560,14 @@
   }
   .blog-theme .sidebar { position: static; }
   .blog-theme .featured-card { grid-template-columns: 1fr; min-height: unset; }
-  .blog-theme .featured-photo { aspect-ratio: 16 / 10; min-height: unset; }
+  .blog-theme .featured-photo { aspect-ratio: auto; min-height: unset; max-height: 70vh; }
+  .blog-theme .featured-photo img { height: auto; max-height: 70vh; object-fit: contain; }
   .blog-theme .featured-body { padding: var(--s-5) var(--s-4); }
   .blog-theme .blog-hero { padding: 144px var(--s-3) var(--s-6); }
   .blog-theme .categories { padding: var(--s-2) var(--s-3); }
   .blog-theme .post-content { padding: var(--s-5) var(--s-4); }
-  .blog-theme .post-hero-img { height: 320px; }
+  .blog-theme .post-hero-img { height: auto; max-height: 70vh; }
+  .blog-theme .post-hero-img img { height: auto; max-height: 70vh; object-fit: contain; }
   .blog-theme .post-view-wrap { padding: 144px var(--s-3) var(--s-5); }
 }
 
@@ -1595,7 +1597,8 @@
   .blog-theme .section-label { margin-bottom: var(--s-3); }
 
   .blog-theme .featured-card { border-radius: var(--radius-lg); }
-  .blog-theme .featured-photo { aspect-ratio: 16 / 10; }
+  .blog-theme .featured-photo { aspect-ratio: auto; max-height: 70vh; }
+  .blog-theme .featured-photo img { height: auto; max-height: 70vh; object-fit: contain; }
   .blog-theme .featured-body { padding: var(--s-4) var(--s-3); }
   .blog-theme .featured-body h2 { font-size: 24px; margin-bottom: var(--s-2); }
   .blog-theme .featured-body p { font-size: 14px; margin-bottom: var(--s-3); }
@@ -1616,7 +1619,8 @@
 
   .blog-theme .post-view-wrap { padding: 128px var(--s-2) var(--s-4); }
   .blog-theme .post-view { border-radius: var(--radius-lg); }
-  .blog-theme .post-hero-img { height: 220px; }
+  .blog-theme .post-hero-img { height: auto; max-height: 60vh; }
+  .blog-theme .post-hero-img img { height: auto; max-height: 60vh; object-fit: contain; }
   .blog-theme .post-content { padding: var(--s-4) var(--s-3); }
   .blog-theme .body-text { font-size: 15.5px; line-height: 1.8; }
   .blog-theme .body-text > p:first-of-type::first-letter { font-size: 3.2em; margin: 4px 8px 0 0; }

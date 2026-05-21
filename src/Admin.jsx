@@ -1,22 +1,13 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { supabase } from './supabaseClient';
 import AdminLogin from './AdminLogin';
 import { slugify, mdComponents, BLOG_CATEGORIES } from './Blog';
+import BlockEditor, { blocksToMarkdown, markdownToBlocks } from './BlockEditor';
 import './Admin.css';
 import './Blog.css';
-
-/* ─── Templates inserted by the "Add block" toolbar ─── */
-const BLOCK_TEMPLATES = {
-  qa: '\n\n```qa\nQ: Replace with your question.\nA: Replace with your answer.\n\nQ: Add another question?\nA: …and another answer.\n```\n\n',
-  quote: '\n\n```quote\nA short, memorable line worth pausing on.\n— Optional attribution\n```\n\n',
-  gallery: '\n\n```gallery\nhttps://image-url-1.jpg | Optional caption\nhttps://image-url-2.jpg | Optional caption\nhttps://image-url-3.jpg\n```\n\n',
-  callout: '\n\n```callout\nA highlighted thought you want the reader to sit with for a moment.\n```\n\n',
-  quiz: '\n\n```quiz\nWhat matters most to you in a connection?\n- Honesty above all\n- Shared sense of humour\n- Being deeply seen\n- Quiet companionship\nResult: There is no wrong answer — but the way you answer says something about how you might show up on LoveHuddle.\n```\n\n',
-  safety: '\n\n```safety\nTitle: LoveHuddle Safety — While You Read\nSubtitle: How we protect every user, every Huddle\n- ✅ Identity Verification | Every profile is verified before they can Huddle.\n- 🧠 AI-Huddle-Core™ Shield | Proactive AI monitoring flags unsafe behaviour.\n- 🔒 End-to-End Encryption | Your conversations are private. Always.\n- 🚨 One-Tap Report & Block | Instant action, reviewed within 2 hours.\n```\n\n',
-};
 
 /* ─── Simple hash function (mirrors AdminLogin) ─── */
 async function hashString(str) {
@@ -56,7 +47,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     const [slugTouched, setSlugTouched] = useState(false);
     const [subtitle, setSubtitle] = useState('');
     const [excerpt, setExcerpt] = useState('');
-    const [content, setContent] = useState('');
+    const [blocks, setBlocks] = useState([]);
     const [coverImageUrl, setCoverImageUrl] = useState('');
     const [metaDescription, setMetaDescription] = useState('');
     const [videoEmbedUrl, setVideoEmbedUrl] = useState('');
@@ -68,64 +59,13 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     const [showPreview, setShowPreview] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
 
+    /* Derived markdown — kept in sync with the block list, used for preview + save */
+    const content = useMemo(() => blocksToMarkdown(blocks), [blocks]);
+
     /* ── Auto-generate slug from title until user edits it ── */
     useEffect(() => {
         if (!slugTouched) setSlug(slugify(title));
     }, [title, slugTouched]);
-
-    /* ── Content textarea ref + cursor-aware insert ── */
-    const contentRef = useRef(null);
-    const insertAtCursor = (text) => {
-        const ta = contentRef.current;
-        if (!ta) {
-            setContent(prev => (prev ? prev + text : text));
-            return;
-        }
-        const start = ta.selectionStart ?? content.length;
-        const end = ta.selectionEnd ?? content.length;
-        const next = content.slice(0, start) + text + content.slice(end);
-        setContent(next);
-        requestAnimationFrame(() => {
-            ta.focus();
-            const pos = start + text.length;
-            ta.setSelectionRange(pos, pos);
-        });
-    };
-
-    /* ── Upload an image directly into the article body ── */
-    const handleInlineImageUpload = async (file) => {
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            showToast('Please choose an image file.', 'error');
-            return;
-        }
-        if (file.size > 8 * 1024 * 1024) {
-            showToast('Image must be under 8MB.', 'error');
-            return;
-        }
-        setUploading(true);
-        try {
-            const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-            const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-            const { error: uploadError } = await supabase.storage
-                .from('blog-images')
-                .upload(safeName, file, {
-                    cacheControl: '31536000',
-                    upsert: false,
-                    contentType: file.type,
-                });
-            if (uploadError) throw uploadError;
-            const { data: publicUrl } = supabase.storage
-                .from('blog-images')
-                .getPublicUrl(safeName);
-            insertAtCursor(`\n\n![Describe this image](${publicUrl.publicUrl})\n\n`);
-            showToast('Image added to your article.');
-        } catch (err) {
-            const msg = err?.message || 'Upload failed.';
-            showToast(msg.includes('bucket') ? 'Storage bucket "blog-images" missing — run the latest supabase-setup.sql in Supabase.' : msg, 'error');
-        }
-        setUploading(false);
-    };
 
     /* ── Password change state ── */
     const [currentPass, setCurrentPass] = useState('');
@@ -137,6 +77,9 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     /* ── Waitlist search ── */
     const [searchQuery, setSearchQuery] = useState('');
 
+    /* ── Supabase setup health-check (storage bucket + table schema) ── */
+    const [setupIssue, setSetupIssue] = useState(null);
+
     /* ── Check session on mount ── */
     useEffect(() => {
         try {
@@ -146,6 +89,40 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             }
         } catch { /* invalid session */ }
     }, []);
+
+    /* ── Run setup health-check once authenticated ── */
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                /* 1. Storage bucket — listing 1 object returns an error if the bucket is missing */
+                const storageProbe = await supabase.storage.from('lovehuddle').list('', { limit: 1 });
+                if (cancelled) return;
+                if (storageProbe.error) {
+                    const m = (storageProbe.error.message || '').toLowerCase();
+                    if (m.includes('not found') || m.includes('bucket')) {
+                        setSetupIssue('storage');
+                        return;
+                    }
+                }
+                /* 2. Table schema — selecting the newest columns will error if the migration hasn't been run */
+                const schemaProbe = await supabase.from('blog_posts').select('category,featured,slug,cover_image_url').limit(1);
+                if (cancelled) return;
+                if (schemaProbe.error) {
+                    const m = (schemaProbe.error.message || '').toLowerCase();
+                    if (m.includes('column') || m.includes('does not exist') || m.includes('schema')) {
+                        setSetupIssue('schema');
+                        return;
+                    }
+                }
+                setSetupIssue(null);
+            } catch {
+                /* network or other transient — don't show a false banner */
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [isAuthenticated]);
 
     /* ── Show login if not authenticated ── */
     if (!isAuthenticated) {
@@ -169,7 +146,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         setSlugTouched(false);
         setSubtitle('');
         setExcerpt('');
-        setContent('');
+        setBlocks([]);
         setCoverImageUrl('');
         setMetaDescription('');
         setVideoEmbedUrl('');
@@ -182,17 +159,21 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     /* ── Submit blog post (create or edit) ── */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!title.trim() || !content.trim()) return;
+        const md = content.trim();
+        if (!title.trim() || !md) {
+            showToast('Add a title and at least one block before saving.', 'error');
+            return;
+        }
 
         const finalSlug = (slug.trim() || slugify(title)).trim();
-        const finalExcerpt = excerpt.trim() || subtitle.trim() || content.trim().replace(/[#*_`>]/g, '').substring(0, 160).trim() + '…';
+        const finalExcerpt = excerpt.trim() || subtitle.trim() || md.replace(/[#*_`>]/g, '').substring(0, 160).trim() + '…';
 
         const payload = {
             title: title.trim(),
             slug: finalSlug,
             subtitle: subtitle.trim(),
             excerpt: finalExcerpt,
-            content: content.trim(),
+            content: md,
             cover_image_url: coverImageUrl.trim(),
             meta_description: metaDescription.trim(),
             video_embed_url: videoEmbedUrl.trim(),
@@ -219,11 +200,20 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             resetForm();
         } catch (err) {
             const msg = err?.message || 'Failed to save article.';
-            showToast(msg.includes('duplicate') ? 'That slug already exists. Choose another.' : msg, 'error');
+            const lower = msg.toLowerCase();
+            if (lower.includes('duplicate')) {
+                showToast('That slug already exists — choose a different one.', 'error');
+            } else if (lower.includes('row-level security') || lower.includes('rls') || lower.includes('violates row')) {
+                showToast('Database is blocking the save (RLS is on). In Supabase → SQL Editor, run: ALTER TABLE blog_posts DISABLE ROW LEVEL SECURITY;', 'error');
+            } else if (lower.includes('column') || lower.includes('does not exist') || lower.includes('schema')) {
+                showToast('Your database is out of date — open Supabase → SQL Editor and run supabase-setup.sql, then try again.', 'error');
+            } else {
+                showToast(msg, 'error');
+            }
         }
     };
 
-    /* ── Image upload (Supabase Storage → blog-images bucket) ── */
+    /* ── Image upload (Supabase Storage → lovehuddle bucket) ── */
     const handleImageUpload = async (file, setter) => {
         if (!file) return;
         if (!file.type.startsWith('image/')) {
@@ -239,7 +229,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
             const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
             const { error: uploadError } = await supabase.storage
-                .from('blog-images')
+                .from('lovehuddle')
                 .upload(safeName, file, {
                     cacheControl: '31536000',
                     upsert: false,
@@ -247,13 +237,13 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                 });
             if (uploadError) throw uploadError;
             const { data: publicUrl } = supabase.storage
-                .from('blog-images')
+                .from('lovehuddle')
                 .getPublicUrl(safeName);
             setter(publicUrl.publicUrl);
             showToast('Image uploaded.');
         } catch (err) {
             const msg = err?.message || 'Upload failed.';
-            showToast(msg.includes('bucket') ? 'Storage bucket "blog-images" missing — run the latest supabase-setup.sql in Supabase.' : msg, 'error');
+            showToast(msg.includes('bucket') ? 'Storage bucket "lovehuddle" missing — run the latest supabase-setup.sql in Supabase.' : msg, 'error');
         }
         setUploading(false);
     };
@@ -266,7 +256,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         setSlugTouched(true);
         setSubtitle(post.subtitle || '');
         setExcerpt(post.excerpt || '');
-        setContent(post.content || '');
+        setBlocks(markdownToBlocks(post.content || ''));
         setCoverImageUrl(post.cover_image_url || '');
         setMetaDescription(post.meta_description || '');
         setVideoEmbedUrl(post.video_embed_url || '');
@@ -388,6 +378,22 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             </div>
 
             <div className="admin-content">
+                {setupIssue && (
+                    <div className="admin-setup-banner" role="alert">
+                        <span className="icon" aria-hidden="true">⚠️</span>
+                        <div>
+                            <h4>
+                                {setupIssue === 'storage'
+                                    ? 'Image storage isn\'t set up yet'
+                                    : 'Your database is missing the latest columns'}
+                            </h4>
+                            <p>
+                                Open your Supabase project → <strong>SQL Editor</strong> → <strong>New query</strong>, paste the contents of <code>supabase-setup.sql</code> from this repository, and click <strong>Run</strong>. It's safe to re-run — it only creates anything that's missing. After that, reload this page and you'll be able to upload images and publish articles.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 {/* ═══════ ARTICLES TAB ═══════ */}
                 {activeTab === 'articles' && (
                     <>
@@ -480,56 +486,17 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
 
                                 <div className="input-group">
                                     <label>
-                                        Content
-                                        <span className="char-count">{content.length} chars</span>
+                                        Article body
+                                        <span className="char-count">{blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}</span>
                                     </label>
-
-                                    <div className="admin-block-toolbar" role="toolbar" aria-label="Insert a content block">
-                                        <span className="admin-block-toolbar-label">Add a block:</span>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.qa)}>
-                                            <span aria-hidden="true">💬</span> Q&amp;A
-                                        </button>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.quote)}>
-                                            <span aria-hidden="true">❝</span> Pull quote
-                                        </button>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.gallery)}>
-                                            <span aria-hidden="true">🖼</span> Photo gallery
-                                        </button>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.callout)}>
-                                            <span aria-hidden="true">✦</span> Callout
-                                        </button>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.quiz)}>
-                                            <span aria-hidden="true">◎</span> Quiz
-                                        </button>
-                                        <button type="button" className="admin-block-btn" onClick={() => insertAtCursor(BLOCK_TEMPLATES.safety)}>
-                                            <span aria-hidden="true">🛡</span> Safety panel
-                                        </button>
-                                        <label className={`admin-block-btn admin-block-upload ${uploading ? 'is-uploading' : ''}`}>
-                                            <span aria-hidden="true">📷</span> {uploading ? 'Uploading…' : 'Upload image'}
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => {
-                                                    handleInlineImageUpload(e.target.files?.[0]);
-                                                    e.target.value = '';
-                                                }}
-                                                disabled={uploading}
-                                                hidden
-                                            />
-                                        </label>
-                                    </div>
-
-                                    <textarea
-                                        ref={contentRef}
-                                        value={content}
-                                        onChange={(e) => setContent(e.target.value)}
-                                        placeholder={'Start writing your story.\n\nUse the buttons above to add Q&A, photo galleries, pull quotes, callouts or a quiz — they drop in pre-filled templates you can type over.\n\nFor a heading, start a line with ##\nFor a subheading, use ###\nFor a divider, use ---\n\nLeave a blank line between paragraphs.'}
-                                        rows="16"
-                                        required
-                                    ></textarea>
-                                    <p className="admin-help">
-                                        Click an "Add a block" button above to insert a Q&amp;A, pull quote, photo gallery, callout or quiz — just type over the placeholder text. "Upload image" drops a picture straight into your story at the cursor.
+                                    <p className="admin-help admin-help-top">
+                                        Build your article one section at a time. Click <strong>+ Add block</strong> to add a heading, paragraph, image, quote, Q&amp;A, gallery, callout, quiz, safety panel or divider. Each block has its own fields — no need to write Markdown.
                                     </p>
+                                    <BlockEditor
+                                        blocks={blocks}
+                                        onChange={setBlocks}
+                                        onError={(msg) => showToast(msg, 'error')}
+                                    />
                                 </div>
 
                                 <div className="input-group">

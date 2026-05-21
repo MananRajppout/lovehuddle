@@ -419,6 +419,8 @@ function App() {
         cover_image_url: newPost.cover_image_url || null,
         meta_description: newPost.meta_description || null,
         video_embed_url: newPost.video_embed_url || null,
+        category: newPost.category || 'Founder Notes',
+        featured: newPost.featured === true,
         published: newPost.published !== false,
         date: newPost.date,
       };
@@ -447,6 +449,8 @@ function App() {
         cover_image_url: updatedPost.cover_image_url || null,
         meta_description: updatedPost.meta_description || null,
         video_embed_url: updatedPost.video_embed_url || null,
+        category: updatedPost.category || 'Founder Notes',
+        featured: updatedPost.featured === true,
         published: updatedPost.published !== false,
       };
       const { data, error } = await supabase

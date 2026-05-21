@@ -62,7 +62,7 @@ FOR EACH ROW EXECUTE FUNCTION set_blog_posts_updated_at();
 
 -- 1c. Storage bucket for blog images (public read)
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('blog-images', 'blog-images', true)
+VALUES ('lovehuddle', 'lovehuddle', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
 -- Storage policies: public read, anonymous write/delete (admin route is
@@ -70,19 +70,19 @@ ON CONFLICT (id) DO UPDATE SET public = true;
 -- and wire real Supabase Auth into the admin login).
 DROP POLICY IF EXISTS "Public read for blog images" ON storage.objects;
 CREATE POLICY "Public read for blog images" ON storage.objects
-FOR SELECT USING (bucket_id = 'blog-images');
+FOR SELECT USING (bucket_id = 'lovehuddle');
 
-DROP POLICY IF EXISTS "Anyone can upload to blog-images" ON storage.objects;
-CREATE POLICY "Anyone can upload to blog-images" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'blog-images');
+DROP POLICY IF EXISTS "Anyone can upload to lovehuddle" ON storage.objects;
+CREATE POLICY "Anyone can upload to lovehuddle" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'lovehuddle');
 
-DROP POLICY IF EXISTS "Anyone can update blog-images" ON storage.objects;
-CREATE POLICY "Anyone can update blog-images" ON storage.objects
-FOR UPDATE USING (bucket_id = 'blog-images');
+DROP POLICY IF EXISTS "Anyone can update lovehuddle" ON storage.objects;
+CREATE POLICY "Anyone can update lovehuddle" ON storage.objects
+FOR UPDATE USING (bucket_id = 'lovehuddle');
 
-DROP POLICY IF EXISTS "Anyone can delete blog-images" ON storage.objects;
-CREATE POLICY "Anyone can delete blog-images" ON storage.objects
-FOR DELETE USING (bucket_id = 'blog-images');
+DROP POLICY IF EXISTS "Anyone can delete lovehuddle" ON storage.objects;
+CREATE POLICY "Anyone can delete lovehuddle" ON storage.objects
+FOR DELETE USING (bucket_id = 'lovehuddle');
 
 -- 2. Create waitlist_entries table
 CREATE TABLE IF NOT EXISTS waitlist_entries (

@@ -12,12 +12,12 @@ const POSTS_PER_PAGE = 6;
 /* ─── Category list (matches the journal mockup) ─── */
 export const BLOG_CATEGORIES = [
   'Founder Notes',
-  'Dating Culture',
+  'Dating News',
   'Safety & Trust',
   'AI & Design',
   'LoveHuddle News',
-  'Quizzes',
-  'Real Connections',
+  'Success Stories',
+  'Press & Awards',
 ];
 
 /** Map a category name to a CSS modifier for the coloured tag */

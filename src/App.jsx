@@ -82,6 +82,29 @@ function PoweredByCore() {
   );
 }
 
+/* ─── PFN (People's First Network) Box ─── */
+function PeopleFirstNetwork() {
+  const ref = useReveal();
+  return (
+    <div ref={ref} className="pfn-box">
+      <div className="pfn-glow" aria-hidden="true"></div>
+      <div className="pfn-inner">
+        <div className="pfn-badge">PFN</div>
+        <div className="pfn-divider" aria-hidden="true"></div>
+        <div className="pfn-content">
+          <h4 className="pfn-title">
+            PFN - People's First Network: <span className="pfn-subtitle">The People‑First Model</span>
+          </h4>
+          <p className="pfn-text">
+            LoveHuddle is built on one rule: people come first.<br />
+            Everything is designed to feel calm, respectful, and human.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Launch Announcement ─── */
 function LaunchAnnounce() {
   const ref = useReveal();
@@ -189,6 +212,11 @@ function Landing({ blogPosts, onJoinWaitlist }) {
           <LaunchAnnounce />
         </div>
       </header>
+
+      {/* PFN (People's First Network) Section */}
+      <section className="pfn-section">
+        <PeopleFirstNetwork />
+      </section>
 
       {/* Powered by AI-Huddle-Core (between hero and disruption) */}
       <section className="powered-by-section">
@@ -342,8 +370,18 @@ function Landing({ blogPosts, onJoinWaitlist }) {
               <h2>The Founder's <span className="gradient-text">Offer</span></h2>
               <p>LoveHuddle is a solo-founded disruptor proving that the future of tech doesn't belong to Silicon Valley—it belongs to the community.</p>
               <div className="offer-box">
-                <h3>100% Free Core Use</h3>
-                <p>Optional premium add-ons may come later, but the heart of LoveHuddle will always be free. We are giving away the first <b>500 verifications for FREE</b>.</p>
+                <h3>LOVEHUDDLE — Founder’s Thank‑You Offer</h3>
+                <div className="offer-sections">
+                  <div className="offer-section">
+                    <h4>Why It’s Free</h4>
+                    <p>We’re starting from zero, and it takes time to attract users. This is our thank‑you for being patient while the community grows and for supporting LoveHuddle in its earliest days.</p>
+                  </div>
+                  <div className="offer-section">
+                    <h4>What You Get</h4>
+                    <p>The core of LoveHuddle is always free.</p>
+                    <p>As one of the first 2,000 members, you’ll also get 90% of all premium features free, just for joining early.</p>
+                  </div>
+                </div>
               </div>
               <div className="confidentiality-notice">
                 <p><small><b>Confidentiality:</b> To protect our world‑first architecture, mechanics remain under wraps until launch. Founding members get the first exclusive look.</small></p>

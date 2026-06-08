@@ -250,6 +250,35 @@ function Landing({ blogPosts, onJoinWaitlist }) {
         </RevealSection>
       </section>
 
+      {/* Founder's Offer */}
+      <section className="founders-offer">
+        <div className="section-container">
+          <RevealSection>
+            <div className="offer-content">
+              <h2>The Founder's <span className="gradient-text">Offer</span></h2>
+              <p>LoveHuddle is a solo-founded disruptor proving that the future of tech doesn't belong to Silicon Valley—it belongs to the community.</p>
+              <div className="offer-box">
+                <h3>LOVEHUDDLE — Founder’s Thank‑You Offer</h3>
+                <div className="offer-sections">
+                  <div className="offer-section">
+                    <h4>Why It’s Free</h4>
+                    <p>We’re starting from zero, and it takes time to attract users. This is our thank‑you for being patient while the community grows and for supporting LoveHuddle in its earliest days.</p>
+                  </div>
+                  <div className="offer-section">
+                    <h4>What You Get</h4>
+                    <p>The core of LoveHuddle is always free.</p>
+                    <p>As one of the first 2,000 members, you’ll also get 90% of all premium features free, just for joining early.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="confidentiality-notice">
+                <p><small><b>Confidentiality:</b> To protect our world‑first architecture, mechanics remain under wraps until launch. Founding members get the first exclusive look.</small></p>
+              </div>
+            </div>
+          </RevealSection>
+        </div>
+      </section>
+
       {/* Roadmap Section */}
       <section id="roadmap" className="roadmap-section">
         <div className="section-container">
@@ -362,34 +391,7 @@ function Landing({ blogPosts, onJoinWaitlist }) {
         </RevealSection>
       </section>
 
-      {/* Founder's Offer */}
-      <section className="founders-offer">
-        <div className="section-container">
-          <RevealSection>
-            <div className="offer-content">
-              <h2>The Founder's <span className="gradient-text">Offer</span></h2>
-              <p>LoveHuddle is a solo-founded disruptor proving that the future of tech doesn't belong to Silicon Valley—it belongs to the community.</p>
-              <div className="offer-box">
-                <h3>LOVEHUDDLE — Founder’s Thank‑You Offer</h3>
-                <div className="offer-sections">
-                  <div className="offer-section">
-                    <h4>Why It’s Free</h4>
-                    <p>We’re starting from zero, and it takes time to attract users. This is our thank‑you for being patient while the community grows and for supporting LoveHuddle in its earliest days.</p>
-                  </div>
-                  <div className="offer-section">
-                    <h4>What You Get</h4>
-                    <p>The core of LoveHuddle is always free.</p>
-                    <p>As one of the first 2,000 members, you’ll also get 90% of all premium features free, just for joining early.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="confidentiality-notice">
-                <p><small><b>Confidentiality:</b> To protect our world‑first architecture, mechanics remain under wraps until launch. Founding members get the first exclusive look.</small></p>
-              </div>
-            </div>
-          </RevealSection>
-        </div>
-      </section>
+
 
 
     </>

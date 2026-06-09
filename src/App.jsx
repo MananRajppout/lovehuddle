@@ -93,7 +93,7 @@ function PeopleFirstNetwork() {
         <div className="pfn-divider" aria-hidden="true"></div>
         <div className="pfn-content">
           <h4 className="pfn-title">
-            PFN - People's First Network: <span className="pfn-subtitle">The People‑First Model</span>
+            PFN - People's First Network
           </h4>
           <p className="pfn-text">
             LoveHuddle is built on one rule: people come first.<br />

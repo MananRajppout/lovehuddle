@@ -4,7 +4,10 @@ import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import './App.css';
 import logo from './assets/images/logo.png';
 import heroBg from './assets/images/hero-bg.png';
-import finalistBadge from './assets/images/badge.jpeg';
+import walesStartupBadge from './assets/images/wales-startup-2026.jpeg';
+import globalRecognitionBadge from './assets/images/global-recognition-2026.jpeg';
+import greatBritishBadge from './assets/images/great-british-entrepreneur-2026.jpeg';
+import Recognition from './Recognition';
 import aiHuddleCore from './assets/images/aihuddlecore.png';
 import Admin from './Admin';
 import PrivacyPolicy from './PrivacyPolicy';
@@ -213,6 +216,38 @@ function Landing({ blogPosts, onJoinWaitlist }) {
         </div>
       </header>
 
+      {/* Recognised By Section */}
+      <section className="recognised-section">
+        <div className="section-container">
+          <RevealSection>
+            <h2 className="recognised-title">Recognised By</h2>
+            <div className="recognised-badges">
+              <div className="recognised-badge-item">
+                <div className="recognised-badge-ring">
+                  <img src={walesStartupBadge} alt="Wales StartUp Awards 2026 Finalist" className="recognised-badge-img" />
+                </div>
+                <span className="recognised-badge-caption">Wales StartUp Awards 2026 — Finalist</span>
+              </div>
+              <div className="recognised-badge-item">
+                <div className="recognised-badge-ring">
+                  <img src={globalRecognitionBadge} alt="Global Recognition Award 2026 Winner" className="recognised-badge-img" />
+                </div>
+                <span className="recognised-badge-caption">Global Recognition Award 2026 — Winner</span>
+              </div>
+              <div className="recognised-badge-item">
+                <div className="recognised-badge-ring">
+                  <img src={greatBritishBadge} alt="Great British Entrepreneur Awards 2026 Finalist" className="recognised-badge-img" />
+                </div>
+                <span className="recognised-badge-caption">Great British Entrepreneur Awards 2026 — Finalist</span>
+              </div>
+            </div>
+            <div className="recognised-cta">
+              <Link to="/recognition" className="recognised-link">See our recognition →</Link>
+            </div>
+          </RevealSection>
+        </div>
+      </section>
+
       {/* PFN (People's First Network) Section */}
       <section className="pfn-section">
         <PeopleFirstNetwork />
@@ -311,57 +346,6 @@ function Landing({ blogPosts, onJoinWaitlist }) {
         </div>
       </section>
 
-      {/* Achievements Section */}
-      <section id="achievements" className="achievements-section">
-        <div className="section-container">
-          <RevealSection>
-            <div className="achievements-inner">
-              <div className="achievements-badge-col">
-                <a
-                  href="https://walesstartupwards.wales"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="achievements-badge-link"
-                >
-                  <div className="achievements-badge-ring">
-                    <img src={finalistBadge} alt="Wales StartUp Awards 2026 Finalist" className="achievements-badge-img" />
-                  </div>
-                </a>
-                <span className="achievements-badge-caption">Wales StartUp Awards 2026</span>
-              </div>
-              <div className="achievements-copy">
-                <p className="achievements-eyebrow">✨ Our Achievements</p>
-                <h2 className="achievements-headline">
-                  Named a Finalist <span className="gradient-text">Before a Single Line of Code Was Written</span>
-                </h2>
-                <p className="achievements-desc">
-                  In early 2026, before development had even commenced, LoveHuddle was officially announced as a <strong>Finalist</strong> for the prestigious <strong>Wales StartUp Awards 2026</strong> in the highly competitive <strong>Innovative StartUp of the Year</strong> category.
-                </p>
-                <p className="achievements-desc">
-                  This early recognition is a powerful testament to our core philosophy: a bold idea, visionary architecture, and an unwavering commitment to disrupting the status quo can resonate profoundly—even before the platform launches. It proves the industry is hungry for a revolution in human connection.
-                </p>
-                <p className="achievements-desc">
-                  <strong>Built solo. Created in Wales. Already turning heads.</strong>
-                </p>
-                <div className="achievements-stats">
-                  <div className="achievement-stat">
-                    <span className="achievement-stat-num">2026</span>
-                    <span className="achievement-stat-label">Shortlist Year</span>
-                  </div>
-                  <div className="achievement-stat">
-                    <span className="achievement-stat-num">#1</span>
-                    <span className="achievement-stat-label">Solo Founder</span>
-                  </div>
-                  <div className="achievement-stat">
-                    <span className="achievement-stat-num">Wales</span>
-                    <span className="achievement-stat-label">Created &amp; Built</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </RevealSection>
-        </div>
-      </section>
 
       {/* Articles Section — preview of latest journal posts */}
       <section id="articles" className="section-container">
@@ -530,7 +514,7 @@ function App() {
             <div className="nav-links">
               <a href="/#disruption">The Disruption</a>
               <a href="/#roadmap">The Roadmap</a>
-              <a href="/#achievements">Achievements</a>
+              <Link to="/recognition">Recognition</Link>
               <Link to="/blog">Blog</Link>
               <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
             </div>
@@ -541,6 +525,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Landing blogPosts={blogPosts} onJoinWaitlist={addToWaitlist} />} />
+        <Route path="/recognition" element={<Recognition />} />
         <Route path="/blog" element={<BlogIndex fallbackPosts={blogPosts} />} />
         <Route path="/blog/:slug" element={<BlogPost fallbackPosts={blogPosts} />} />
         <Route path="/admin" element={<Admin posts={blogPosts} onAddPost={addPost} onEditPost={editPost} onDeletePost={deletePost} waitlist={waitlist} />} />

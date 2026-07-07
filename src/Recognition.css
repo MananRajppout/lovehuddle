@@ -1,0 +1,195 @@
+/* ================================================
+   LOVEHUDDLE — Recognition.css
+   ================================================ */
+
+.recognition-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 120px 24px 80px;
+}
+
+.recognition-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.recognition-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+  background: var(--lh-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+}
+
+.recognition-lead {
+  font-size: 1.15rem;
+  color: var(--lh-text-muted);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.recognition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+.recognition-card {
+  background: var(--lh-bg-card);
+  border: 1px solid var(--lh-border-subtle);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.recognition-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--lh-red), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.recognition-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(232, 0, 29, 0.3);
+  box-shadow: 0 20px 40px rgba(232, 0, 29, 0.08);
+}
+
+.recognition-card:hover::before {
+  opacity: 1;
+}
+
+.recognition-card.winner {
+  border-color: rgba(255, 215, 0, 0.25);
+}
+
+.recognition-card.winner::before {
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+}
+
+.recognition-card.winner:hover {
+  border-color: rgba(255, 215, 0, 0.45);
+  box-shadow: 0 20px 40px rgba(255, 215, 0, 0.08);
+}
+
+.recognition-img-wrap {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--lh-border-subtle);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.recognition-card.winner .recognition-img-wrap {
+  background: conic-gradient(from 0deg, #ffd700, #e8001d, #ffd700, #d4956a, #ffd700);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+  padding: 5px;
+  border: none;
+}
+
+.recognition-card:hover .recognition-img-wrap {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.recognition-badge-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #0d0a0b;
+}
+
+.recognition-type-pill {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--lh-text-muted);
+}
+
+.recognition-card.winner .recognition-type-pill {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.35);
+  color: #ffd700;
+}
+
+.recognition-card.finalist .recognition-type-pill {
+  background: rgba(232, 0, 29, 0.1);
+  border-color: rgba(232, 0, 29, 0.35);
+  color: var(--lh-red-light);
+}
+
+.recognition-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--lh-text);
+  margin-bottom: 0.5rem;
+  line-height: 1.25;
+}
+
+.recognition-org {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--lh-skin-light);
+  letter-spacing: 0.02em;
+  margin-bottom: 1.5rem;
+  opacity: 0.85;
+}
+
+.recognition-desc {
+  font-size: 0.95rem;
+  color: var(--lh-text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.recognition-back-wrap {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .recognition-page {
+    padding: 100px 20px 60px;
+  }
+
+  .recognition-grid {
+    gap: 1.75rem;
+  }
+
+  .recognition-card {
+    padding: 2rem 1.5rem;
+  }
+}

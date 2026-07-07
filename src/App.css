@@ -210,110 +210,130 @@
   max-width: 860px;
 }
 
-/* ─── AWARD BADGE ─────────────────────────────── */
-.award-badge-link {
-  position: absolute;
-  bottom: 48px;
-  right: 48px;
-  z-index: 3;
-  display: block;
-  text-decoration: none;
-  animation: badgeEntry 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both;
+/* ─── RECOGNISED BY SECTION ─────────────────────── */
+.recognised-section {
+  position: relative;
+  padding: 3.5rem 1.5rem 2.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(13, 10, 11, 0.4) 0%, rgba(13, 10, 11, 0.8) 100%);
+  border-bottom: 1px solid var(--lh-border-subtle);
+  overflow: hidden;
+  text-align: center;
 }
 
-@keyframes badgeEntry {
-  from {
-    opacity: 0;
-    transform: scale(0.4) rotate(-20deg);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
+.recognised-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--lh-skin-light);
+  margin-bottom: 2rem;
+  opacity: 0.85;
 }
 
-.award-badge {
-  width: 120px;
-  height: 120px;
+.recognised-badges {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4rem;
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  flex-wrap: wrap;
+}
+
+.recognised-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 220px;
+  max-width: 260px;
+}
+
+.recognised-badge-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  padding: 2.5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--lh-border-subtle);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recognised-badge-item:hover .recognised-badge-ring {
+  transform: scale(1.1) rotate(3deg);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+/* Make the winner stand out slightly more */
+.recognised-badge-item:nth-child(2) .recognised-badge-ring {
+  background: conic-gradient(from 0deg, #ffd700, #e8001d, #ffd700, #d4956a, #ffd700);
+  border: none;
+  padding: 3px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
+}
+
+.recognised-badge-item:nth-child(2):hover .recognised-badge-ring {
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+}
+
+.recognised-badge-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid rgba(255, 215, 0, 0.55);
-  box-shadow:
-    0 0 0 6px rgba(255, 215, 0, 0.1),
-    0 0 30px rgba(255, 215, 0, 0.25),
-    0 8px 32px rgba(0, 0, 0, 0.5);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.4s ease,
-    border-color 0.3s;
-  animation: badgePulse 3s ease-in-out infinite 1.8s;
-  display: block;
+  background: #0d0a0b;
 }
 
-@keyframes badgePulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.1), 0 0 30px rgba(255, 215, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
-  50% {
-    box-shadow: 0 0 0 10px rgba(255, 215, 0, 0.18), 0 0 50px rgba(255, 215, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.5);
-  }
+.recognised-badge-caption {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--lh-text-muted);
+  line-height: 1.4;
+  transition: color 0.25s;
 }
 
-.award-badge-link:hover .award-badge {
-  transform: scale(1.1) rotate(5deg);
-  border-color: rgba(255, 215, 0, 0.9);
-  box-shadow:
-    0 0 0 10px rgba(255, 215, 0, 0.2),
-    0 0 50px rgba(255, 215, 0, 0.5),
-    0 12px 40px rgba(0, 0, 0, 0.6);
+.recognised-badge-item:hover .recognised-badge-caption {
+  color: var(--lh-text);
 }
 
-.award-badge-tooltip {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  right: 0;
-  background: rgba(13, 10, 11, 0.92);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  color: #ffd700;
-  font-size: 0.72rem;
-  font-weight: 700;
-  white-space: nowrap;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
-  letter-spacing: 0.04em;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.25s, transform 0.25s;
-  backdrop-filter: blur(8px);
+.recognised-cta {
+  margin-top: 1.5rem;
 }
 
-.award-badge-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  right: 20px;
-  border: 5px solid transparent;
-  border-top-color: rgba(255, 215, 0, 0.3);
+.recognised-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lh-skin-light);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.25s, transform 0.25s;
 }
 
-.award-badge-link:hover .award-badge-tooltip {
-  opacity: 1;
-  transform: translateY(0);
+.recognised-link:hover {
+  color: var(--lh-text);
+  transform: translateX(4px);
 }
 
 @media (max-width: 768px) {
-  .award-badge-link {
-    bottom: 24px;
-    right: 20px;
+  .recognised-section {
+    padding: 2.5rem 1rem 1.5rem;
   }
 
-  .award-badge {
-    width: 88px;
-    height: 88px;
+  .recognised-badges {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .recognised-badge-item {
+    min-width: unset;
+    max-width: 280px;
   }
 }
 

@@ -558,6 +558,12 @@ function App() {
               <Link to="/cookies">Cookie Policy</Link>
               <Link to="/contact">Contact Us</Link>
             </div>
+            <div className="footer-col">
+              <h4>Social</h4>
+              <a href="https://instagram.com/lovehuddleofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://tiktok.com/@lovehuddle" target="_blank" rel="noopener noreferrer">TikTok</a>
+              <a href="https://youtube.com/@LoveHuddle" target="_blank" rel="noopener noreferrer">YouTube</a>
+            </div>
           </div>
           <div className="footer-divider"></div>
           <div className="footer-bottom-bar">

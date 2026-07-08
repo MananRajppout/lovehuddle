@@ -94,7 +94,7 @@
 .recognition-img-wrap {
   width: 160px;
   height: 160px;
-  border-radius: 50%;
+  border-radius: 20px;
   padding: 4px;
   background: rgba(255, 255, 255, 0.05);
   margin-bottom: 2rem;
@@ -120,7 +120,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+  border-radius: 16px;
   background: #0d0a0b;
 }
 

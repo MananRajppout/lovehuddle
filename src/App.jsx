@@ -223,7 +223,7 @@ function Landing({ blogPosts, onJoinWaitlist }) {
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content animate-fade-in">
-          <div className="hero-eyebrow">Beta Launching September 2026</div>
+          <div className="hero-eyebrow">Beta Launching Autumn 2026</div>
           <h1 className="hero-title">The End of the <span className="gradient-text">Swipe Era</span>.</h1>
           <p className="hero-subtitle">No Paywalls. No Pressure. Just People.</p>
           <p className="hero-tagline">A New Kind of Hybrid Connection Platform.</p>

@@ -126,14 +126,13 @@
 
 /* ─── HERO ────────────────────────────────────── */
 .hero {
-  height: 100vh;
-  min-height: 800px;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   text-align: center;
-  padding: 30px 24px 0 24px;
+  padding: 140px 24px 80px 24px;
   overflow: hidden;
 }
 

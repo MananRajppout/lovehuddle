@@ -2,146 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://lovehuddle.co.uk/</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/blog</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/safety</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/contact</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/privacy</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/terms</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://lovehuddle.co.uk/cookies</loc>
-    <lastmod>2026-07-08</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/pfn-why-i-built-a-peoplefirst-network</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/aihuddlecore-built-to-do-the-opposite-of-ai</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/lovehuddle-named-finalist-in-the-2026-allica-bank-great-british-entrepreneur-awards</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/june-2026-the-month-the-dating-industry-started-to-change</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/why-lovehuddle-won-a-2026-global-recognition</loc>
-    <lastmod>2026-06-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/the-safety-room-why-every-member-must-spend-1520-seconds-here</loc>
-    <lastmod>2026-06-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/why-your-gallery-photos-must-match-your-verified-face</loc>
-    <lastmod>2026-06-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/why-trust-safety-was-the-first-thing-i-built</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/the-logo-that-took-more-than-six-rounds-to-get-right</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/the-dating-world-is-breaking-down-and-everyone-knows-it-dating-news-may-202</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/opw-industry-mention</loc>
-    <lastmod>2026-07-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/top-5-finalist-at-the-wales-start-up-awards</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/The-reality-of-building-lovehuddle-sleepless-nights-part-time-work-and-why-im-doing-it-anyway</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/milestone-one-wireframe-complete</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/why-gen-z-is-moving-beyond-the-swipe-what-the-data-shows</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/the-dating-app-burnout-crisis-why-modern-singles-are-swiped-out</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://lovehuddle.co.uk/blog/lovehuddle-founder</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>

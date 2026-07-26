@@ -74,8 +74,24 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     const [passLoading, setPassLoading] = useState(false);
     const [passError, setPassError] = useState('');
 
-    /* ── Waitlist search ── */
+    /* ── Waitlist search & filtering ── */
     const [searchQuery, setSearchQuery] = useState('');
+
+    const ukSignups = useMemo(() => waitlist.filter(e => e.region === 'UK'), [waitlist]);
+    const usaSignups = useMemo(() => waitlist.filter(e => e.region === 'USA'), [waitlist]);
+    const otherSignups = useMemo(() => waitlist.filter(e => e.region !== 'UK' && e.region !== 'USA'), [waitlist]);
+
+    const filteredUK = useMemo(() => ukSignups.filter(e =>
+        e.email.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [ukSignups, searchQuery]);
+
+    const filteredUSA = useMemo(() => usaSignups.filter(e =>
+        e.email.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [usaSignups, searchQuery]);
+
+    const filteredOther = useMemo(() => otherSignups.filter(e =>
+        e.email.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [otherSignups, searchQuery]);
 
     /* ── Supabase setup health-check (storage bucket + table schema) ── */
     const [setupIssue, setSetupIssue] = useState(null);
@@ -323,8 +339,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
             showToast('No signups to export.', 'error');
             return;
         }
-        const header = 'Email,Date Joined\n';
-        const rows = waitlist.map(e => `"${e.email}","${e.date}"`).join('\n');
+        const header = 'Email,Region,Date Joined\n';
+        const rows = waitlist.map(e => `"${e.email}","${e.region || 'Unassigned'}","${e.date}"`).join('\n');
         const blob = new Blob([header + rows], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -334,11 +350,6 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         URL.revokeObjectURL(url);
         showToast('Waitlist exported as CSV!');
     };
-
-    /* ── Filtered waitlist ── */
-    const filteredWaitlist = waitlist.filter(e =>
-        e.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     return (
         <div className="admin-dashboard animate-fade-in">
@@ -635,10 +646,31 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                 {activeTab === 'waitlist' && (
                     <section className="admin-section glass">
                         <h3>Waiting List Signups</h3>
+                        
                         <div className="waitlist-stats">
                             <div className="stat-card">
                                 <span className="stat-number">{waitlist.length}</span>
                                 <span className="stat-label">Total Signups</span>
+                            </div>
+                            <div className="stat-card region-stat-card">
+                                <div className="stat-header">
+                                    <span className="stat-flag">🇬🇧</span>
+                                    <span className="stat-label">U.K. Pool</span>
+                                </div>
+                                <span className="stat-number">{ukSignups.length} <span className="stat-cap">/ 1,500</span></span>
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar uk-progress" style={{ width: `${Math.min(100, (ukSignups.length / 1500) * 100)}%` }}></div>
+                                </div>
+                            </div>
+                            <div className="stat-card region-stat-card">
+                                <div className="stat-header">
+                                    <span className="stat-flag">🇺🇸</span>
+                                    <span className="stat-label">U.S.A. Pool</span>
+                                </div>
+                                <span className="stat-number">{usaSignups.length} <span className="stat-cap">/ 1,500</span></span>
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar usa-progress" style={{ width: `${Math.min(100, (usaSignups.length / 1500) * 100)}%` }}></div>
+                                </div>
                             </div>
                         </div>
 
@@ -655,22 +687,74 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             </button>
                         </div>
 
-                        <div className="admin-posts-list">
-                            {filteredWaitlist.length === 0 ? (
-                                <p className="empty-state">
-                                    {searchQuery ? 'No matching signups found.' : 'No signups yet. People who join the waiting list will appear here.'}
-                                </p>
-                            ) : (
-                                filteredWaitlist.map((entry, i) => (
-                                    <div key={i} className="admin-post-item glass">
-                                        <div className="post-info">
-                                            <h4>{entry.email}</h4>
-                                            <span>Joined: {entry.date}</span>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
+                        <div className="waitlist-columns">
+                            {/* UK COLUMN */}
+                            <div className="waitlist-column glass">
+                                <div className="column-header">
+                                    <h4>🇬🇧 U.K. Signups ({filteredUK.length})</h4>
+                                    <span className="column-subtitle">Progress: {Math.min(100, (ukSignups.length / 1500) * 100).toFixed(1)}%</span>
+                                </div>
+                                <div className="column-list">
+                                    {filteredUK.length === 0 ? (
+                                        <p className="empty-column">
+                                            {searchQuery ? 'No matching UK signups.' : 'No UK signups yet.'}
+                                        </p>
+                                    ) : (
+                                        filteredUK.map((entry, i) => (
+                                            <div key={i} className="waitlist-item-card glass">
+                                                <div className="item-info">
+                                                    <h4>{entry.email}</h4>
+                                                    <span>Joined: {entry.date}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* USA COLUMN */}
+                            <div className="waitlist-column glass">
+                                <div className="column-header">
+                                    <h4>🇺🇸 U.S.A. Signups ({filteredUSA.length})</h4>
+                                    <span className="column-subtitle">Progress: {Math.min(100, (usaSignups.length / 1500) * 100).toFixed(1)}%</span>
+                                </div>
+                                <div className="column-list">
+                                    {filteredUSA.length === 0 ? (
+                                        <p className="empty-column">
+                                            {searchQuery ? 'No matching USA signups.' : 'No USA signups yet.'}
+                                        </p>
+                                    ) : (
+                                        filteredUSA.map((entry, i) => (
+                                            <div key={i} className="waitlist-item-card glass">
+                                                <div className="item-info">
+                                                    <h4>{entry.email}</h4>
+                                                    <span>Joined: {entry.date}</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
                         </div>
+
+                        {/* LEGACY / UNASSIGNED SECTION */}
+                        {filteredOther.length > 0 && (
+                            <div className="waitlist-legacy-section glass">
+                                <div className="column-header">
+                                    <h4>Legacy / Unassigned Signups ({filteredOther.length})</h4>
+                                </div>
+                                <div className="legacy-list">
+                                    {filteredOther.map((entry, i) => (
+                                        <div key={i} className="waitlist-item-card glass">
+                                            <div className="item-info">
+                                                <h4>{entry.email}</h4>
+                                                <span>Joined: {entry.date}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </section>
                 )}
 

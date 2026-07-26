@@ -7,6 +7,7 @@ import heroBg from './assets/images/hero-bg.png';
 import walesStartupBadge from './assets/images/wales-startup-2026.jpeg';
 import globalRecognitionBadge from './assets/images/global-recognition-2026.jpeg';
 import greatBritishBadge from './assets/images/great-british-entrepreneur-2026.jpeg';
+import oddaBadge from './assets/images/odda-badge.jpg';
 import Recognition from './Recognition';
 import aiHuddleCore from './assets/images/aihuddlecore.png';
 import Admin from './Admin';
@@ -159,16 +160,27 @@ function LaunchAnnounce() {
           <span className="launch-ignite-wrap">
             <span className="launch-ignite">Ignites</span>
           </span>
-          <span className="launch-line-3">
-            <span className="launch-month">September</span>
-            <span className="launch-dot" aria-hidden="true"></span>
-            <span className="launch-year">2026</span>
+          <span className="launch-line-3 launch-soft-launch">
+            U.K. and U.S.A. Soft Launch, Late October 2026
           </span>
         </h3>
 
         <p className="launch-sub">
-          The official build is underway — where dating and real-world social connection finally come together.
+          We're starting from zero, on purpose. As a thank you for your patience while we build this properly, the first 1,500 members in the U.K. and 1,500 in the U.S.A. get every core feature free for 90 days. This is a genuine 4 week testing phase, run by a solo founder, so we can get LoveHuddle right before opening the doors wider. No fake bots, no filler accounts, just real people helping shape something new from day one.
         </p>
+
+        <button 
+          className="btn-primary launch-claim-btn"
+          onClick={() => {
+            const formInput = document.querySelector('.join-form input');
+            if (formInput) {
+              formInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              formInput.focus();
+            }
+          }}
+        >
+          Sign up above to claim your spot.
+        </button>
       </div>
     </div>
   );
@@ -178,14 +190,28 @@ function LaunchAnnounce() {
 function Landing({ blogPosts, onJoinWaitlist }) {
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const [showRegionModal, setShowRegionModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
 
   const handleJoin = (e) => {
     e.preventDefault();
     if (email) {
-      onJoinWaitlist(email);
-      setJoined(true);
-      setEmail('');
+      setPendingEmail(email);
+      setShowRegionModal(true);
     }
+  };
+
+  const handleSelectRegion = (region) => {
+    onJoinWaitlist(pendingEmail, region);
+    setJoined(true);
+    setEmail('');
+    setPendingEmail('');
+    setShowRegionModal(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowRegionModal(false);
+    setPendingEmail('');
   };
 
   return (
@@ -213,8 +239,58 @@ function Landing({ blogPosts, onJoinWaitlist }) {
           </form>
           {joined && <p className="success-msg">✓ Welcome to the inner circle. Stay tuned.</p>}
           <LaunchAnnounce />
+          
+          {/* ODDA Member Badge */}
+          <div className="odda-badge-section">
+            <a 
+              href="https://www.onlinedatingassociation.org.uk/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="odda-badge-link"
+              title="Online Dating & Discovery Association Member"
+            >
+              <img 
+                src={oddaBadge} 
+                alt="Online Dating & Discovery Association Member" 
+                className="odda-badge-img" 
+              />
+            </a>
+          </div>
         </div>
       </header>
+
+      {/* Region Picker Modal */}
+      {showRegionModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="region-modal-card glass" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={handleCloseModal} aria-label="Close modal">&times;</button>
+            <div className="modal-glow"></div>
+            
+            <div className="modal-header">
+              <h3>Choose Your Region</h3>
+              <p>To help us customize your experience and track our 1,500 member soft launch cap, please select your country.</p>
+            </div>
+
+            <div className="region-options-grid">
+              <button className="region-option-card" onClick={() => handleSelectRegion('UK')}>
+                <div className="region-flag">🇬🇧</div>
+                <div className="region-details">
+                  <span className="region-name">United Kingdom</span>
+                  <span className="region-limit">Soft Launch Cap: 1,500</span>
+                </div>
+              </button>
+
+              <button className="region-option-card" onClick={() => handleSelectRegion('USA')}>
+                <div className="region-flag">🇺🇸</div>
+                <div className="region-details">
+                  <span className="region-name">United States</span>
+                  <span className="region-limit">Soft Launch Cap: 1,500</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Recognised By Section */}
       <section className="recognised-section">
@@ -422,8 +498,8 @@ function App() {
     fetchWaitlist();
   }, []);
 
-  const addToWaitlist = async (email) => {
-    const entry = { email, date: new Date().toLocaleString('en-GB') };
+  const addToWaitlist = async (email, region) => {
+    const entry = { email, region, date: new Date().toLocaleString('en-GB') };
     try {
       await supabase.from('waitlist_entries').insert([entry]);
       setWaitlist(prev => [entry, ...prev]);

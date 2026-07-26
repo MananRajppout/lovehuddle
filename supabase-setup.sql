@@ -89,8 +89,12 @@ CREATE TABLE IF NOT EXISTS waitlist_entries (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     date VARCHAR(100) NOT NULL,
+    region VARCHAR(50),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Alter table to add region column if it doesn't exist
+ALTER TABLE waitlist_entries ADD COLUMN IF NOT EXISTS region VARCHAR(50);
 
 -- 3. Disable RLS (Row Level Security) for simple public access
 ALTER TABLE blog_posts DISABLE ROW LEVEL SECURITY;

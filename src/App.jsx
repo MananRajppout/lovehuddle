@@ -166,7 +166,7 @@ function LaunchAnnounce() {
         </h3>
 
         <p className="launch-sub">
-          We're starting from zero, and launching this autumn. We're welcoming our first one thousand members in the UK and our first one thousand in the USA completely free for three months, as our thank you for joining us early. It might feel a little quiet at first, and that's by design. Unlike dating sites of the past, we're not filling this with fake bots or filler accounts. Every core feature is one hundred percent free, no paywalls, no hiding behind fake tables, just real profiles and real connection. Every single person here is real, and we're building this from the ground up together. So we're asking for a little patience in these early days, and if you're having fun, tell your friends, because that's how we grow into something genuinely special.
+          We're starting from zero, and launching this autumn. We're welcoming our first one thousand members in the UK and USA completely free for three months, as our thank you for joining us early. It might feel a little quiet at first, and that's by design. Unlike dating sites of the past, we're not filling this with fake bots or filler accounts. Every core feature is one hundred percent free, no paywalls, no hiding behind fake tables, just real profiles and real connection. Every single person here is real, and we're building this from the ground up together. So we're asking for a little patience in these early days, and if you're having fun, tell your friends, because that's how we grow into something genuinely special.
         </p>
 
         <div className="launch-highlight-badge">
@@ -589,15 +589,15 @@ function App() {
     const isUsaOrUk = normalizedRegion === 'USA' || normalizedRegion === 'UK';
 
     try {
-      // 1. Fetch exact current count from Supabase to prevent race conditions
-      let count = 0;
+      // 1. Fetch exact current combined count from Supabase to prevent race conditions
+      let combinedCount = 0;
       if (isUsaOrUk) {
         const { count: dbCount, error: countErr } = await supabase
           .from('waitlist_entries')
           .select('id', { count: 'exact', head: true })
-          .eq('region', normalizedRegion);
+          .in('region', ['USA', 'UK']);
         if (!countErr && dbCount !== null) {
-          count = dbCount;
+          combinedCount = dbCount;
         }
       }
 
@@ -630,17 +630,15 @@ function App() {
           status: 'international',
           message: `Thank you for your interest! LoveHuddle is currently launching exclusively in the UK and USA. We have added you to our international waiting list and will let you know as soon as we launch in ${countryName}.`
         };
-      } else if (count >= 1000) {
-        const countryLabel = normalizedRegion === 'USA' ? 'USA' : 'UK';
+      } else if (combinedCount >= 1000) {
         return {
           status: 'exceeded',
-          message: `Thank you so much for your interest! We are offering our free three-month trial to the first 1,000 members in the ${countryLabel}, and this limit has now been reached. However, we have added you to our waiting list and will let you know as soon as we officially launch.`
+          message: `Thank you so much for your interest! We are offering our free three-month trial to the first 1,000 members in the UK and USA combined, and this limit has now been reached. However, we have added you to our waiting list and will let you know as soon as we officially launch.`
         };
       } else {
-        const countryLabel = normalizedRegion === 'USA' ? 'USA' : 'UK';
         return {
           status: 'success',
-          message: `✓ Welcome! You've successfully claimed one of our free soft launch spots for the first 1,000 members in the ${countryLabel}. We'll be in touch soon!`
+          message: `✓ Welcome! You've successfully claimed one of our free soft launch spots for the first 1,000 members in the UK and USA. We'll be in touch soon!`
         };
       }
     } catch (err) {

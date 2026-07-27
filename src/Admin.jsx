@@ -722,24 +722,22 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                 <span className="stat-number">{waitlist.length}</span>
                                 <span className="stat-label">Total Signups</span>
                             </div>
-                            <div className="stat-card region-stat-card">
+                            <div className="stat-card region-stat-card" style={{ maxWidth: '380px' }}>
                                 <div className="stat-header">
-                                    <span className="stat-flag">🇬🇧</span>
-                                    <span className="stat-label">U.K. Pool</span>
+                                    <span className="stat-flag">🇬🇧 🇺🇸</span>
+                                    <span className="stat-label">Combined U.K. &amp; U.S.A. Pool</span>
                                 </div>
-                                <span className="stat-number">{ukSignups.length} <span className="stat-cap">/ 1,000</span></span>
+                                <span className="stat-number">
+                                    {ukSignups.length + usaSignups.length} <span className="stat-cap">/ 1,000</span>
+                                </span>
                                 <div className="progress-bar-container">
-                                    <div className="progress-bar uk-progress" style={{ width: `${Math.min(100, (ukSignups.length / 1000) * 100)}%` }}></div>
-                                </div>
-                            </div>
-                            <div className="stat-card region-stat-card">
-                                <div className="stat-header">
-                                    <span className="stat-flag">🇺🇸</span>
-                                    <span className="stat-label">U.S.A. Pool</span>
-                                </div>
-                                <span className="stat-number">{usaSignups.length} <span className="stat-cap">/ 1,000</span></span>
-                                <div className="progress-bar-container">
-                                    <div className="progress-bar usa-progress" style={{ width: `${Math.min(100, (usaSignups.length / 1000) * 100)}%` }}></div>
+                                    <div 
+                                        className="progress-bar combined-progress" 
+                                        style={{ 
+                                            width: `${Math.min(100, ((ukSignups.length + usaSignups.length) / 1000) * 100)}%`,
+                                            background: 'linear-gradient(90deg, #ff8a3d, #e8001d)'
+                                        }}
+                                    ></div>
                                 </div>
                             </div>
                         </div>
@@ -762,7 +760,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <div className="waitlist-column glass">
                                 <div className="column-header">
                                     <h4>🇬🇧 U.K. Signups ({filteredUK.length})</h4>
-                                    <span className="column-subtitle">Progress: {Math.min(100, (ukSignups.length / 1000) * 100).toFixed(1)}%</span>
+                                    <span className="column-subtitle">Combined Progress: {Math.min(100, ((ukSignups.length + usaSignups.length) / 1000) * 100).toFixed(1)}%</span>
                                 </div>
                                 <div className="column-list">
                                     {filteredUK.length === 0 ? (
@@ -786,7 +784,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <div className="waitlist-column glass">
                                 <div className="column-header">
                                     <h4>🇺🇸 U.S.A. Signups ({filteredUSA.length})</h4>
-                                    <span className="column-subtitle">Progress: {Math.min(100, (usaSignups.length / 1000) * 100).toFixed(1)}%</span>
+                                    <span className="column-subtitle">Combined Progress: {Math.min(100, ((ukSignups.length + usaSignups.length) / 1000) * 100).toFixed(1)}%</span>
                                 </div>
                                 <div className="column-list">
                                     {filteredUSA.length === 0 ? (

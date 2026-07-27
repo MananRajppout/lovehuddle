@@ -166,8 +166,15 @@ function LaunchAnnounce() {
         </h3>
 
         <p className="launch-sub">
-          We're starting from zero, on purpose. As a thank you for your patience while we build this properly, the first 1,500 members in the U.K. and 1,500 in the U.S.A. get every core feature free for 90 days. This is a genuine 4 week testing phase, run by a solo founder, so we can get LoveHuddle right before opening the doors wider. No fake bots, no filler accounts, just real people helping shape something new from day one.
+          We're starting from zero, and launching this autumn. We're welcoming our first one thousand members in the UK and our first one thousand in the USA completely free for three months, as our thank you for joining us early. It might feel a little quiet at first, and that's by design. Unlike dating sites of the past, we're not filling this with fake bots or filler accounts. Every core feature is one hundred percent free, no paywalls, no hiding behind fake tables, just real profiles and real connection. Every single person here is real, and we're building this from the ground up together. So we're asking for a little patience in these early days, and if you're having fun, tell your friends, because that's how we grow into something genuinely special.
         </p>
+
+        <div className="launch-highlight-badge">
+          <div className="badge-glow" aria-hidden="true"></div>
+          <span className="badge-text">
+            Built by a solo founder who'd rather redefine the rulebook than clone somebody else's app.
+          </span>
+        </div>
 
         <button 
           className="btn-primary launch-claim-btn"
@@ -187,26 +194,46 @@ function LaunchAnnounce() {
 }
 
 /* ─── Landing Page Component ─── */
-function Landing({ blogPosts, onJoinWaitlist }) {
+function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const [waitlistMsg, setWaitlistMsg] = useState('');
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleJoin = (e) => {
+  const handleJoin = async (e) => {
     e.preventDefault();
-    if (email) {
+    if (!email || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setJoined(false);
+    
+    // Auto-signup if country is detected as USA or UK, or if country is detected as international
+    if (detectedCountry) {
+      const result = await onJoinWaitlist(email, detectedCountry);
+      setWaitlistMsg(result.message);
+      setJoined(true);
+      setEmail('');
+      setIsSubmitting(false);
+    } else {
+      // Fallback: show modal if we couldn't detect country
       setPendingEmail(email);
       setShowRegionModal(true);
+      setIsSubmitting(false);
     }
   };
 
-  const handleSelectRegion = (region) => {
-    onJoinWaitlist(pendingEmail, region);
+  const handleSelectRegion = async (region) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const result = await onJoinWaitlist(pendingEmail, region);
+    setWaitlistMsg(result.message);
     setJoined(true);
     setEmail('');
     setPendingEmail('');
     setShowRegionModal(false);
+    setIsSubmitting(false);
   };
 
   const handleCloseModal = () => {
@@ -234,10 +261,13 @@ function Landing({ blogPosts, onJoinWaitlist }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isSubmitting}
             />
-            <button type="submit" className="btn-primary">Join Waiting List</button>
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Checking...' : 'Join Waiting List'}
+            </button>
           </form>
-          {joined && <p className="success-msg">✓ Welcome to the inner circle. Stay tuned.</p>}
+          {joined && <p className="success-msg" style={{ maxWidth: '600px', margin: '1rem auto', lineHeight: '1.5' }}>{waitlistMsg}</p>}
           <LaunchAnnounce />
           
           {/* ODDA Member Badge */}
@@ -268,23 +298,31 @@ function Landing({ blogPosts, onJoinWaitlist }) {
             
             <div className="modal-header">
               <h3>Choose Your Region</h3>
-              <p>To help us customize your experience and track our 1,500 member soft launch cap, please select your country.</p>
+              <p>To help us customize your experience and track our 1,000 member soft launch cap, please select your country.</p>
             </div>
 
             <div className="region-options-grid">
-              <button className="region-option-card" onClick={() => handleSelectRegion('UK')}>
+              <button className="region-option-card" onClick={() => handleSelectRegion('UK')} disabled={isSubmitting}>
                 <div className="region-flag">🇬🇧</div>
                 <div className="region-details">
                   <span className="region-name">United Kingdom</span>
-                  <span className="region-limit">Soft Launch Cap: 1,500</span>
+                  <span className="region-limit">Soft Launch Cap: 1,000</span>
                 </div>
               </button>
 
-              <button className="region-option-card" onClick={() => handleSelectRegion('USA')}>
+              <button className="region-option-card" onClick={() => handleSelectRegion('USA')} disabled={isSubmitting}>
                 <div className="region-flag">🇺🇸</div>
                 <div className="region-details">
                   <span className="region-name">United States</span>
-                  <span className="region-limit">Soft Launch Cap: 1,500</span>
+                  <span className="region-limit">Soft Launch Cap: 1,000</span>
+                </div>
+              </button>
+
+              <button className="region-option-card" onClick={() => handleSelectRegion('Other')} disabled={isSubmitting}>
+                <div className="region-flag">🌐</div>
+                <div className="region-details">
+                  <span className="region-name">Other / International</span>
+                  <span className="region-limit">Launching Later</span>
                 </div>
               </button>
             </div>
@@ -359,35 +397,6 @@ function Landing({ blogPosts, onJoinWaitlist }) {
             </div>
           </div>
         </RevealSection>
-      </section>
-
-      {/* Founder's Offer */}
-      <section className="founders-offer">
-        <div className="section-container">
-          <RevealSection>
-            <div className="offer-content">
-              <h2>The Founder's <span className="gradient-text">Offer</span></h2>
-              <p>LoveHuddle is a solo-founded disruptor proving that the future of tech doesn't belong to Silicon Valley—it belongs to the community.</p>
-              <div className="offer-box">
-                <h3>LOVEHUDDLE — Founder’s Thank‑You Offer</h3>
-                <div className="offer-sections">
-                  <div className="offer-section">
-                    <h4>Why It’s Free</h4>
-                    <p>We’re starting from zero, and it takes time to attract users. This is our thank‑you for being patient while the community grows and for supporting LoveHuddle in its earliest days.</p>
-                  </div>
-                  <div className="offer-section">
-                    <h4>What You Get</h4>
-                    <p>The core of LoveHuddle is always free.</p>
-                    <p>As one of the first 2,000 members, you’ll also get 90% of all premium features free, just for joining early.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="confidentiality-notice">
-                <p><small><b>Confidentiality:</b> To protect our world‑first architecture, mechanics remain under wraps until launch. Founding members get the first exclusive look.</small></p>
-              </div>
-            </div>
-          </RevealSection>
-        </div>
       </section>
 
       {/* Roadmap Section */}
@@ -465,6 +474,79 @@ const DEFAULT_BLOG_POSTS = [];
 function App() {
   const [waitlist, setWaitlist] = useState([]);
   const [blogPosts, setBlogPosts] = useState(DEFAULT_BLOG_POSTS);
+  const [detectedCountry, setDetectedCountry] = useState(null);
+
+  /* ── Track unique visitor and detect country ── */
+  useEffect(() => {
+    const trackVisitorAndDetectCountry = async () => {
+      let code = null;
+      try {
+        const res = await fetch('https://api.country.is');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.country) {
+            code = data.country;
+          }
+        }
+      } catch (err) {
+        console.log('Failed to detect country via api.country.is, trying fallback...');
+      }
+
+      if (!code) {
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.country_code) {
+              code = data.country_code;
+            }
+          }
+        } catch (err) {
+          console.log('Fallback country detection failed.');
+        }
+      }
+
+      if (code) {
+        setDetectedCountry(code);
+      }
+
+      // Check if visit is already logged for this device/browser
+      const isLogged = localStorage.getItem('lh_visit_logged');
+      if (!isLogged) {
+        let visitorId = localStorage.getItem('lh_visitor_id');
+        if (!visitorId) {
+          visitorId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
+          localStorage.setItem('lh_visitor_id', visitorId);
+        }
+
+        let countryName = 'Unknown';
+        if (code) {
+          try {
+            const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+            countryName = regionNames.of(code) || code;
+          } catch (e) {
+            countryName = code;
+          }
+        }
+
+        try {
+          const { error } = await supabase.from('site_visits').upsert({
+            visitor_id: visitorId,
+            country: countryName,
+            country_code: code || 'XX'
+          }, { onConflict: 'visitor_id' });
+          
+          if (!error) {
+            localStorage.setItem('lh_visit_logged', 'true');
+          }
+        } catch (dbErr) {
+          console.error('Failed to log site visit to database:', dbErr);
+        }
+      }
+    };
+
+    trackVisitorAndDetectCountry();
+  }, []);
 
   /* ── Fetch blog posts from Supabase on mount ── */
   useEffect(() => {
@@ -499,12 +581,81 @@ function App() {
   }, []);
 
   const addToWaitlist = async (email, region) => {
-    const entry = { email, region, date: new Date().toLocaleString('en-GB') };
+    // Normalize region: if 'US' or 'USA' -> 'USA', if 'GB' or 'UK' -> 'UK'.
+    let normalizedRegion = region;
+    if (region === 'US' || region === 'USA') normalizedRegion = 'USA';
+    if (region === 'GB' || region === 'UK') normalizedRegion = 'UK';
+
+    const isUsaOrUk = normalizedRegion === 'USA' || normalizedRegion === 'UK';
+
     try {
-      await supabase.from('waitlist_entries').insert([entry]);
+      // 1. Fetch exact current count from Supabase to prevent race conditions
+      let count = 0;
+      if (isUsaOrUk) {
+        const { count: dbCount, error: countErr } = await supabase
+          .from('waitlist_entries')
+          .select('id', { count: 'exact', head: true })
+          .eq('region', normalizedRegion);
+        if (!countErr && dbCount !== null) {
+          count = dbCount;
+        }
+      }
+
+      // 2. Perform insertion
+      const entry = { 
+        email, 
+        region: normalizedRegion, 
+        date: new Date().toLocaleString('en-GB') 
+      };
+      
+      const { error: insertErr } = await supabase.from('waitlist_entries').insert([entry]);
+      if (insertErr) throw insertErr;
+
+      // Update state
       setWaitlist(prev => [entry, ...prev]);
+
+      // 3. Return appropriate response
+      if (!isUsaOrUk) {
+        let countryName = normalizedRegion;
+        if (normalizedRegion !== 'Other') {
+          try {
+            const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+            countryName = regionNames.of(normalizedRegion) || normalizedRegion;
+          } catch (e) {}
+        } else {
+          countryName = 'your country';
+        }
+        
+        return {
+          status: 'international',
+          message: `Thank you for your interest! LoveHuddle is currently launching exclusively in the UK and USA. We have added you to our international waiting list and will let you know as soon as we launch in ${countryName}.`
+        };
+      } else if (count >= 1000) {
+        const countryLabel = normalizedRegion === 'USA' ? 'USA' : 'UK';
+        return {
+          status: 'exceeded',
+          message: `Thank you so much for your interest! We are offering our free three-month trial to the first 1,000 members in the ${countryLabel}, and this limit has now been reached. However, we have added you to our waiting list and will let you know as soon as we officially launch.`
+        };
+      } else {
+        const countryLabel = normalizedRegion === 'USA' ? 'USA' : 'UK';
+        return {
+          status: 'success',
+          message: `✓ Welcome! You've successfully claimed one of our free soft launch spots for the first 1,000 members in the ${countryLabel}. We'll be in touch soon!`
+        };
+      }
     } catch (err) {
       console.error('Failed to add to waitlist:', err);
+      const msg = err?.message || '';
+      if (msg.toLowerCase().includes('duplicate') || err?.code === '23505') {
+        return {
+          status: 'duplicate',
+          message: 'This email is already registered on our waiting list. Stay tuned for updates!'
+        };
+      }
+      return {
+        status: 'error',
+        message: 'Something went wrong. Please check your connection and try again.'
+      };
     }
   };
 
@@ -600,7 +751,7 @@ function App() {
 
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Landing blogPosts={blogPosts} onJoinWaitlist={addToWaitlist} />} />
+        <Route path="/" element={<Landing blogPosts={blogPosts} onJoinWaitlist={addToWaitlist} detectedCountry={detectedCountry} />} />
         <Route path="/recognition" element={<Recognition />} />
         <Route path="/blog" element={<BlogIndex fallbackPosts={blogPosts} />} />
         <Route path="/blog/:slug" element={<BlogPost fallbackPosts={blogPosts} />} />

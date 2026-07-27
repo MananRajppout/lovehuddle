@@ -93,8 +93,62 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
         e.email.toLowerCase().includes(searchQuery.toLowerCase())
     ), [otherSignups, searchQuery]);
 
+    /* ── Visitor Stats calculations ── */
+    const getFlagEmoji = (countryCode) => {
+        if (!countryCode || countryCode === 'XX' || countryCode === 'Unknown') return '🌐';
+        const codePoints = countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => 127397 + char.charCodeAt(0));
+        try {
+            return String.fromCodePoint(...codePoints);
+        } catch {
+            return '🌐';
+        }
+    };
+
+    const countryStats = useMemo(() => {
+        const counts = {};
+        visits.forEach(v => {
+            const code = v.country_code || 'XX';
+            const name = v.country || 'Unknown';
+            if (!counts[code]) {
+                counts[code] = { code, name, count: 0 };
+            }
+            counts[code].count += 1;
+        });
+        return Object.values(counts).sort((a, b) => b.count - a.count);
+    }, [visits]);
+
     /* ── Supabase setup health-check (storage bucket + table schema) ── */
     const [setupIssue, setSetupIssue] = useState(null);
+
+    /* ── Visitor tracking state ── */
+    const [visits, setVisits] = useState([]);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+    const fetchVisits = async () => {
+        setAnalyticsLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('site_visits')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (!error && data) {
+                setVisits(data);
+            }
+        } catch (err) {
+            console.log('Failed to fetch site visits:', err);
+        }
+        setAnalyticsLoading(false);
+    };
+
+    /* ── Fetch site visits from Supabase ── */
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchVisits();
+        }
+    }, [isAuthenticated]);
 
     /* ── Check session on mount ── */
     useEffect(() => {
@@ -129,6 +183,16 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                     const m = (schemaProbe.error.message || '').toLowerCase();
                     if (m.includes('column') || m.includes('does not exist') || m.includes('schema')) {
                         setSetupIssue('schema');
+                        return;
+                    }
+                }
+                /* 3. Site visits table — check if we can select from it */
+                const visitsProbe = await supabase.from('site_visits').select('id').limit(1);
+                if (cancelled) return;
+                if (visitsProbe.error) {
+                    const m = (visitsProbe.error.message || '').toLowerCase();
+                    if (m.includes('relation') || m.includes('does not exist') || m.includes('schema')) {
+                        setSetupIssue('visits_schema');
                         return;
                     }
                 }
@@ -381,6 +445,12 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                     📋 Waitlist ({waitlist.length})
                 </button>
                 <button
+                    className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('analytics')}
+                >
+                    📈 Visitors ({visits.length})
+                </button>
+                <button
                     className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
                     onClick={() => setActiveTab('settings')}
                 >
@@ -396,10 +466,12 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <h4>
                                 {setupIssue === 'storage'
                                     ? 'Image storage isn\'t set up yet'
+                                    : setupIssue === 'visits_schema'
+                                    ? 'Analytics database table is missing'
                                     : 'Your database is missing the latest columns'}
                             </h4>
                             <p>
-                                Open your Supabase project → <strong>SQL Editor</strong> → <strong>New query</strong>, paste the contents of <code>supabase-setup.sql</code> from this repository, and click <strong>Run</strong>. It's safe to re-run — it only creates anything that's missing. After that, reload this page and you'll be able to upload images and publish articles.
+                                Open your Supabase project → <strong>SQL Editor</strong> → <strong>New query</strong>, paste the contents of <code>supabase-setup.sql</code> from this repository, and click <strong>Run</strong>. It's safe to re-run — it only creates anything that's missing. After that, reload this page.
                             </p>
                         </div>
                     </div>
@@ -657,9 +729,9 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                     <span className="stat-flag">🇬🇧</span>
                                     <span className="stat-label">U.K. Pool</span>
                                 </div>
-                                <span className="stat-number">{ukSignups.length} <span className="stat-cap">/ 1,500</span></span>
+                                <span className="stat-number">{ukSignups.length} <span className="stat-cap">/ 1,000</span></span>
                                 <div className="progress-bar-container">
-                                    <div className="progress-bar uk-progress" style={{ width: `${Math.min(100, (ukSignups.length / 1500) * 100)}%` }}></div>
+                                    <div className="progress-bar uk-progress" style={{ width: `${Math.min(100, (ukSignups.length / 1000) * 100)}%` }}></div>
                                 </div>
                             </div>
                             <div className="stat-card region-stat-card">
@@ -667,9 +739,9 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                     <span className="stat-flag">🇺🇸</span>
                                     <span className="stat-label">U.S.A. Pool</span>
                                 </div>
-                                <span className="stat-number">{usaSignups.length} <span className="stat-cap">/ 1,500</span></span>
+                                <span className="stat-number">{usaSignups.length} <span className="stat-cap">/ 1,000</span></span>
                                 <div className="progress-bar-container">
-                                    <div className="progress-bar usa-progress" style={{ width: `${Math.min(100, (usaSignups.length / 1500) * 100)}%` }}></div>
+                                    <div className="progress-bar usa-progress" style={{ width: `${Math.min(100, (usaSignups.length / 1000) * 100)}%` }}></div>
                                 </div>
                             </div>
                         </div>
@@ -692,7 +764,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <div className="waitlist-column glass">
                                 <div className="column-header">
                                     <h4>🇬🇧 U.K. Signups ({filteredUK.length})</h4>
-                                    <span className="column-subtitle">Progress: {Math.min(100, (ukSignups.length / 1500) * 100).toFixed(1)}%</span>
+                                    <span className="column-subtitle">Progress: {Math.min(100, (ukSignups.length / 1000) * 100).toFixed(1)}%</span>
                                 </div>
                                 <div className="column-list">
                                     {filteredUK.length === 0 ? (
@@ -716,7 +788,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                             <div className="waitlist-column glass">
                                 <div className="column-header">
                                     <h4>🇺🇸 U.S.A. Signups ({filteredUSA.length})</h4>
-                                    <span className="column-subtitle">Progress: {Math.min(100, (usaSignups.length / 1500) * 100).toFixed(1)}%</span>
+                                    <span className="column-subtitle">Progress: {Math.min(100, (usaSignups.length / 1000) * 100).toFixed(1)}%</span>
                                 </div>
                                 <div className="column-list">
                                     {filteredUSA.length === 0 ? (
@@ -754,6 +826,108 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                     ))}
                                 </div>
                             </div>
+                        )}
+                    </section>
+                )}
+
+                {/* ═══════ ANALYTICS TAB ═══════ */}
+                {activeTab === 'analytics' && (
+                    <section className="admin-section glass">
+                        <div className="analytics-header">
+                            <h3>Visitor Analytics</h3>
+                            <button className="btn-refresh" onClick={fetchVisits} disabled={analyticsLoading}>
+                                {analyticsLoading ? '🔄 Refreshing...' : '🔄 Refresh Stats'}
+                            </button>
+                        </div>
+
+                        {analyticsLoading && visits.length === 0 ? (
+                            <p className="empty-state">Loading visitor stats...</p>
+                        ) : (
+                            <>
+                                <div className="analytics-overview-cards">
+                                    <div className="stat-card">
+                                        <span className="stat-number">{visits.length}</span>
+                                        <span className="stat-label">Total Unique Visitors</span>
+                                    </div>
+                                    <div className="stat-card">
+                                        <span className="stat-number">{countryStats.length}</span>
+                                        <span className="stat-label">Unique Countries</span>
+                                    </div>
+                                </div>
+
+                                <div className="analytics-layout-grid">
+                                    {/* Country Breakdown */}
+                                    <div className="analytics-block glass">
+                                        <div className="block-header">
+                                            <h4>Visitors by Country</h4>
+                                        </div>
+                                        <div className="country-stats-list">
+                                            {countryStats.length === 0 ? (
+                                                <p className="empty-state-small">No visitors tracked yet.</p>
+                                            ) : (
+                                                countryStats.map((stat, i) => {
+                                                    const percentage = visits.length > 0 
+                                                        ? ((stat.count / visits.length) * 100).toFixed(1) 
+                                                        : 0;
+                                                    return (
+                                                        <div key={i} className="country-stat-row">
+                                                            <div className="country-info-left">
+                                                                <span className="country-flag-icon">{getFlagEmoji(stat.code)}</span>
+                                                                <span className="country-name-txt">{stat.name}</span>
+                                                                <span className="country-code-badge">{stat.code}</span>
+                                                            </div>
+                                                            <div className="country-info-right">
+                                                                <span className="country-visitor-count">{stat.count} {stat.count === 1 ? 'visit' : 'visits'}</span>
+                                                                <span className="country-visitor-pct">{percentage}%</span>
+                                                            </div>
+                                                            <div className="country-pct-bar-wrapper">
+                                                                <div className="country-pct-bar" style={{ width: `${percentage}%` }}></div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Visitor Logs */}
+                                    <div className="analytics-block glass">
+                                        <div className="block-header">
+                                            <h4>Recent Visitor Logs</h4>
+                                        </div>
+                                        <div className="visitor-logs-list">
+                                            {visits.length === 0 ? (
+                                                <p className="empty-state-small">No visitors recorded yet.</p>
+                                            ) : (
+                                                visits.slice(0, 20).map((visit, i) => (
+                                                    <div key={i} className="visitor-log-item">
+                                                        <div className="log-badge-and-country">
+                                                            <span className="country-flag-icon">{getFlagEmoji(visit.country_code)}</span>
+                                                            <div className="log-country-details">
+                                                                <span className="log-country-name">{visit.country || 'Unknown'}</span>
+                                                                <span className="log-visitor-id">ID: {visit.visitor_id.substring(0, 12)}...</span>
+                                                            </div>
+                                                        </div>
+                                                        <span className="log-timestamp">
+                                                            {new Date(visit.created_at).toLocaleString('en-GB', {
+                                                                day: 'numeric',
+                                                                month: 'short',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                ))
+                                            )}
+                                            {visits.length > 20 && (
+                                                <div className="logs-footer-text">
+                                                    Showing latest 20 visits. Total recorded: {visits.length}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </section>
                 )}

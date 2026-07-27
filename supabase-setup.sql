@@ -96,8 +96,18 @@ CREATE TABLE IF NOT EXISTS waitlist_entries (
 -- Alter table to add region column if it doesn't exist
 ALTER TABLE waitlist_entries ADD COLUMN IF NOT EXISTS region VARCHAR(50);
 
--- 3. Disable RLS (Row Level Security) for simple public access
+-- 3. Create site_visits table
+CREATE TABLE IF NOT EXISTS site_visits (
+    id BIGSERIAL PRIMARY KEY,
+    visitor_id VARCHAR(100) NOT NULL UNIQUE,
+    country VARCHAR(100),
+    country_code VARCHAR(10),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4. Disable RLS (Row Level Security) for simple public access
 ALTER TABLE blog_posts DISABLE ROW LEVEL SECURITY;
 ALTER TABLE waitlist_entries DISABLE ROW LEVEL SECURITY;
+ALTER TABLE site_visits DISABLE ROW LEVEL SECURITY;
 
--- 4. Blog content is managed via /admin (no seed rows — the founder authors posts in the UI).
+-- 5. Blog content is managed via /admin (no seed rows — the founder authors posts in the UI).

@@ -40,6 +40,8 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [activeTab, setActiveTab] = useState('articles');
     const [toast, setToast] = useState(null);
+    const [visits, setVisits] = useState([]);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
     /* ── Blog form state ── */
     const [title, setTitle] = useState('');
@@ -122,10 +124,6 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
 
     /* ── Supabase setup health-check (storage bucket + table schema) ── */
     const [setupIssue, setSetupIssue] = useState(null);
-
-    /* ── Visitor tracking state ── */
-    const [visits, setVisits] = useState([]);
-    const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
     const fetchVisits = async () => {
         setAnalyticsLoading(true);

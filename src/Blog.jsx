@@ -96,28 +96,98 @@ function setCanonical(url) {
   el.setAttribute('href', url);
 }
 
-function toEmbedUrl(rawUrl) {
-  if (!rawUrl) return null;
-  try {
-    const url = new URL(rawUrl);
-    const host = url.hostname.replace('www.', '');
-    if (host === 'youtu.be') {
-      const id = url.pathname.slice(1);
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-    if (host.endsWith('youtube.com')) {
-      const id = url.searchParams.get('v');
-      if (id) return `https://www.youtube.com/embed/${id}`;
-      if (url.pathname.startsWith('/embed/')) return rawUrl;
-    }
-    if (host.endsWith('vimeo.com')) {
-      const id = url.pathname.split('/').filter(Boolean).pop();
-      return id ? `https://player.vimeo.com/video/${id}` : null;
-    }
-    return null;
-  } catch {
-    return null;
+export function toEmbedUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+  let str = rawUrl.trim();
+  if (!str) return null;
+
+  // Extract src if user pasted iframe HTML snippet
+  const iframeMatch = str.match(/src=["']([^"']+)["']/i);
+  if (iframeMatch) {
+    str = iframeMatch[1].trim();
   }
+
+  // YouTube (shorts, live, embed, watch, youtu.be, m.youtube, etc.)
+  const ytMatch = str.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  }
+
+  // Vimeo
+  const vimeoMatch = str.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  // Loom
+  const loomMatch = str.match(/loom\.com\/(?:share|embed)\/([a-f0-9-]+)/i);
+  if (loomMatch && loomMatch[1]) {
+    return `https://www.loom.com/embed/${loomMatch[1]}`;
+  }
+
+  // Spotify
+  const spotifyMatch = str.match(/open\.spotify\.com\/(track|episode|playlist|album)\/([a-zA-Z0-9]+)/i);
+  if (spotifyMatch && spotifyMatch[1] && spotifyMatch[2]) {
+    return `https://open.spotify.com/embed/${spotifyMatch[1]}/${spotifyMatch[2]}`;
+  }
+
+  // TikTok
+  const tiktokMatch = str.match(/tiktok\.com\/@[^\/]+\/video\/(\d+)/i);
+  if (tiktokMatch && tiktokMatch[1]) {
+    return `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`;
+  }
+
+  // Direct Video or Audio files (.mp4, .webm, .mov, .mp3, .wav, etc.)
+  if (/\.(mp4|webm|mov|m4v|ogv|mp3|wav|ogg|m4a|aac|flac)(\?.*)?$/i.test(str)) {
+    return /^https?:\/\//i.test(str) ? str : `https://${str}`;
+  }
+
+  return null;
+}
+
+export function MediaEmbed({ url, title = 'Embedded Media', caption = '' }) {
+  const embedUrl = toEmbedUrl(url);
+  if (!embedUrl) return null;
+
+  const isVideoFile = /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i.test(embedUrl);
+  const isAudioFile = /\.(mp3|wav|ogg|m4a|aac|flac)(\?.*)?$/i.test(embedUrl);
+  const isSpotify = embedUrl.includes('spotify.com/embed');
+
+  return (
+    <figure className="blog-media-embed" style={{ margin: '28px 0' }}>
+      {isVideoFile ? (
+        <video
+          src={embedUrl}
+          controls
+          preload="metadata"
+          style={{ width: '100%', borderRadius: '14px', background: '#000', display: 'block' }}
+        />
+      ) : isAudioFile ? (
+        <audio src={embedUrl} controls style={{ width: '100%', borderRadius: '8px' }} />
+      ) : isSpotify ? (
+        <iframe
+          src={embedUrl}
+          width="100%"
+          height="152"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style={{ borderRadius: '12px' }}
+        />
+      ) : (
+        <div className="video-embed">
+          <iframe
+            src={embedUrl}
+            title={title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )}
+      {caption && <figcaption className="blog-post-figcaption">{caption}</figcaption>}
+    </figure>
+  );
 }
 
 /* ────────────────────────────────────────────────
@@ -125,7 +195,15 @@ function toEmbedUrl(rawUrl) {
    gallery, callout, quiz, safety panel)
    ──────────────────────────────────────────────── */
 
-const BLOCK_LANGS = new Set(['qa', 'quote', 'gallery', 'callout', 'quiz', 'safety']);
+const BLOCK_LANGS = new Set(['qa', 'quote', 'gallery', 'callout', 'quiz', 'safety', 'video']);
+
+function VideoBlockComponent({ raw }) {
+  const lines = splitLines(raw).map(l => l.trim()).filter(Boolean);
+  const rawUrl = lines[0] || '';
+  const caption = lines.slice(1).join(' ') || '';
+  return <MediaEmbed url={rawUrl} caption={caption} />;
+}
+
 
 function splitLines(raw) {
   return String(raw || '').replace(/\r\n/g, '\n').split('\n');
@@ -358,6 +436,25 @@ const mdComponents = {
       {props.alt && <span className="blog-post-figcaption">{props.alt}</span>}
     </span>
   ),
+  p: ({ node, children, ...props }) => {
+    const raw = Array.isArray(children) ? children.join('') : (typeof children === 'string' ? children : '');
+    const trimmed = raw.trim();
+    const embedUrl = toEmbedUrl(trimmed);
+    if (embedUrl && !trimmed.includes('\n') && (trimmed.startsWith('http') || trimmed.startsWith('www') || trimmed.startsWith('youtu') || trimmed.includes('youtube.com') || trimmed.includes('vimeo.com'))) {
+      return (
+        <div className="video-embed" style={{ margin: '32px 0' }}>
+          <iframe
+            src={embedUrl}
+            title="Embedded video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      );
+    }
+    return <p {...props}>{children}</p>;
+  },
   a: ({ node, href, ...props }) => {
     const internal = href && (href.startsWith('/') || href.startsWith('#'));
     if (internal) return <Link to={href} {...props} />;
@@ -381,6 +478,7 @@ const mdComponents = {
     if (lang === 'callout') return <Callout raw={raw} />;
     if (lang === 'quiz') return <Quiz raw={raw} />;
     if (lang === 'safety') return <SafetyPanel raw={raw} />;
+    if (lang === 'video') return <VideoBlockComponent raw={raw} />;
     return <code className={className} {...props}>{children}</code>;
   },
 };
@@ -904,16 +1002,8 @@ export function BlogPost({ fallbackPosts = [] }) {
               </div>
             </div>
 
-            {embedUrl && (
-              <div className="video-embed">
-                <iframe
-                  src={embedUrl}
-                  title={`${post.title} — video`}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+            {post?.video_embed_url && (
+              <MediaEmbed url={post.video_embed_url} title={`${post.title} — media`} />
             )}
 
             <div className="body-text">
@@ -924,6 +1014,14 @@ export function BlogPost({ fallbackPosts = [] }) {
 
             <div className="share-row">
               <span className="share-label">Share:</span>
+              <a
+                className="share-btn"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                📘 Facebook
+              </a>
               <a
                 className="share-btn"
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}

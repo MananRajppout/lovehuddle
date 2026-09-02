@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { supabase } from './supabaseClient';
 import AdminLogin from './AdminLogin';
-import { slugify, mdComponents, BLOG_CATEGORIES } from './Blog';
+import { slugify, mdComponents, BLOG_CATEGORIES, toEmbedUrl, MediaEmbed } from './Blog';
 import BlockEditor, { blocksToMarkdown, markdownToBlocks } from './BlockEditor';
 import './Admin.css';
 import './Blog.css';
@@ -561,8 +561,19 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                         type="url"
                                         value={videoEmbedUrl}
                                         onChange={(e) => setVideoEmbedUrl(e.target.value)}
-                                        placeholder="YouTube or Vimeo URL — appears under the title"
+                                        placeholder="YouTube, Vimeo, Loom, Spotify, TikTok, MP4/MP3 URL"
                                     />
+                                    {videoEmbedUrl && (
+                                        <div className="admin-video-preview" style={{ marginTop: '8px' }}>
+                                            {toEmbedUrl(videoEmbedUrl) ? (
+                                                <MediaEmbed url={videoEmbedUrl} title="Video preview" />
+                                            ) : (
+                                                <p className="admin-help" style={{ color: '#e05a5a' }}>
+                                                    ⚠️ Could not parse media URL. Supported: YouTube, Vimeo, Loom, Spotify, TikTok, MP4/MP3 links.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="input-group">
@@ -571,7 +582,7 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                         <span className="char-count">{blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}</span>
                                     </label>
                                     <p className="admin-help admin-help-top">
-                                        Build your article one section at a time. Click <strong>+ Add block</strong> to add a heading, paragraph, image, quote, Q&amp;A, gallery, callout, quiz, safety panel or divider. Each block has its own fields — no need to write Markdown.
+                                        Build your article one section at a time. Click <strong>+ Add block</strong> to add a heading, paragraph, image, video embed, quote, Q&amp;A, gallery, callout, quiz, safety panel or divider. Each block has its own fields — no need to write Markdown.
                                     </p>
                                     <BlockEditor
                                         blocks={blocks}
@@ -667,6 +678,11 @@ function Admin({ posts, onAddPost, onDeletePost, onEditPost, waitlist = [] }) {
                                                     <h1>{title || 'Untitled'}</h1>
                                                     {subtitle && <p className="post-subtitle">{subtitle}</p>}
                                                 </header>
+
+                                                {videoEmbedUrl && (
+                                                    <MediaEmbed url={videoEmbedUrl} title={`${title || 'Article'} — media`} />
+                                                )}
+
                                                 <div className="body-text">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
                                                         {content}

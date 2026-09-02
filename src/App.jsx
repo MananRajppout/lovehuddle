@@ -39,12 +39,22 @@ function useReveal() {
   return ref;
 }
 
-/* ─── Scroll to top on route change ─── */
+/* ─── Scroll to top / hash anchor handling on route change ─── */
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (hash) {
+      setTimeout(() => {
+        const id = hash.replace('#', '');
+        const el = document.getElementById(id) || document.querySelector(`.${id}`) || document.querySelector(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
   return null;
 }
 
@@ -727,7 +737,17 @@ function App() {
   };
 
   const location = useLocation();
+  const navigate = useNavigate();
   const isAdmin = location.pathname === '/admin';
+
+  const handleJoinClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/#join');
+    } else {
+      const el = document.querySelector('.join-form');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
 
   return (
     <div className="app">
@@ -737,11 +757,11 @@ function App() {
           <div className="nav-content">
             <Link to="/"><img src={logo} alt="LoveHuddle" className="logo" /></Link>
             <div className="nav-links">
-              <a href="/#disruption">The Disruption</a>
-              <a href="/#roadmap">The Roadmap</a>
+              <Link to="/#disruption">The Disruption</Link>
+              <Link to="/#roadmap">The Roadmap</Link>
               <Link to="/recognition">Recognition</Link>
               <Link to="/blog">Blog</Link>
-              <button className="btn-primary" onClick={() => { const el = document.querySelector('.join-form'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}>Join Waiting List</button>
+              <button className="btn-primary" onClick={handleJoinClick}>Join Waiting List</button>
             </div>
           </div>
         </nav>
@@ -785,9 +805,10 @@ function App() {
             </div>
             <div className="footer-col">
               <h4>Social</h4>
-              <a href="https://instagram.com/lovehuddleofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a href="https://tiktok.com/@lovehuddle" target="_blank" rel="noopener noreferrer">TikTok</a>
-              <a href="https://youtube.com/@LoveHuddle" target="_blank" rel="noopener noreferrer">YouTube</a>
+              <a href="https://www.facebook.com/lovehuddle" target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href="https://www.instagram.com/lovehuddleofficial" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://www.tiktok.com/@lovehuddle" target="_blank" rel="noopener noreferrer">TikTok</a>
+              <a href="https://www.youtube.com/@LoveHuddle" target="_blank" rel="noopener noreferrer">YouTube</a>
             </div>
           </div>
           <div className="footer-divider"></div>

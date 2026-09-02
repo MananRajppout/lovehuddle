@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { supabase } from './supabaseClient';
+import { toEmbedUrl, MediaEmbed } from './Blog';
 
 /* ────────────────────────────────────────────────────────────
    Block-based article editor.
@@ -18,6 +19,7 @@ const NEW_BLOCK = {
   heading:   () => ({ id: makeId(), type: 'heading',   level: 2, text: '' }),
   paragraph: () => ({ id: makeId(), type: 'paragraph', text: '' }),
   image:     () => ({ id: makeId(), type: 'image',     url: '', caption: '' }),
+  video:     () => ({ id: makeId(), type: 'video',     url: '', caption: '' }),
   quote:     () => ({ id: makeId(), type: 'quote',     text: '', by: '' }),
   qa:        () => ({ id: makeId(), type: 'qa',        items: [{ q: '', a: '' }] }),
   gallery:   () => ({ id: makeId(), type: 'gallery',   items: [{ url: '', caption: '' }, { url: '', caption: '' }] }),
@@ -31,6 +33,7 @@ const BLOCK_LABELS = {
   heading: 'Heading',
   paragraph: 'Paragraph',
   image: 'Image',
+  video: 'Video embed',
   quote: 'Pull quote',
   qa: 'Q & A',
   gallery: 'Photo gallery',
@@ -44,6 +47,7 @@ const BLOCK_ICONS = {
   heading: 'H',
   paragraph: '¶',
   image: '🖼',
+  video: '▶',
   quote: '❝',
   qa: '💬',
   gallery: '▦',
@@ -83,6 +87,17 @@ export function blocksToMarkdown(blocks) {
         const url = (b.url || '').trim();
         const cap = (b.caption || '').trim();
         if (url) parts.push(`![${cap}](${url})`);
+        break;
+      }
+      case 'video': {
+        const url = (b.url || '').trim();
+        const cap = (b.caption || '').trim();
+        if (url) {
+          const lines = ['```video', url];
+          if (cap) lines.push(cap);
+          lines.push('```');
+          parts.push(lines.join('\n'));
+        }
         break;
       }
       case 'quote': {
@@ -219,6 +234,13 @@ export function markdownToBlocks(md) {
     const img = line.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
     if (img) { blocks.push({ id: makeId(), type: 'image', url: img[2].trim(), caption: img[1].trim() }); i++; continue; }
 
+    /* Standalone video URL */
+    if (toEmbedUrl(line.trim())) {
+      blocks.push({ id: makeId(), type: 'video', url: line.trim(), caption: '' });
+      i++;
+      continue;
+    }
+
     /* Blockquote — collect consecutive `>` lines */
     if (/^>\s*/.test(line)) {
       const qLines = [];
@@ -255,6 +277,12 @@ export function markdownToBlocks(md) {
 function parseFencedBlock(lang, raw) {
   const lines = raw.replace(/\r\n/g, '\n').split('\n');
   switch (lang) {
+    case 'video': {
+      const lines = raw.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(Boolean);
+      const url = lines[0] || '';
+      const caption = lines.slice(1).join(' ') || '';
+      return { id: makeId(), type: 'video', url, caption };
+    }
     case 'quote': {
       const nonEmpty = lines.map(l => l.trim()).filter(Boolean);
       const attrIdx = nonEmpty.findIndex(l => /^[—–-]\s+/.test(l));
@@ -748,10 +776,47 @@ function DividerBlock() {
   return <div className="be-divider-preview">— · — · —</div>;
 }
 
+function VideoBlock({ block, update }) {
+  return (
+    <div className="be-fields">
+      {block.url && (
+        <div className="be-video-preview">
+          {toEmbedUrl(block.url) ? (
+            <MediaEmbed url={block.url} caption={block.caption} />
+          ) : (
+            <p className="admin-help" style={{ color: '#e05a5a', marginBottom: '8px' }}>
+              ⚠️ Could not parse media URL. Supported: YouTube, Vimeo, Loom, Spotify, TikTok, MP4/MP3 links.
+            </p>
+          )}
+        </div>
+      )}
+      <label className="be-field">
+        <span>Media URL or Embed Code</span>
+        <input
+          type="url"
+          value={block.url || ''}
+          onChange={(e) => update({ url: e.target.value })}
+          placeholder="YouTube, Vimeo, Loom, Spotify, TikTok, MP4 or MP3 URL"
+        />
+      </label>
+      <label className="be-field">
+        <span>Caption (optional)</span>
+        <input
+          type="text"
+          value={block.caption || ''}
+          onChange={(e) => update({ caption: e.target.value })}
+          placeholder="Caption shown under the video/media"
+        />
+      </label>
+    </div>
+  );
+}
+
 const BLOCK_COMPONENTS = {
   heading: HeadingBlock,
   paragraph: ParagraphBlock,
   image: ImageBlock,
+  video: VideoBlock,
   quote: QuoteBlock,
   qa: QABlock,
   gallery: GalleryBlock,

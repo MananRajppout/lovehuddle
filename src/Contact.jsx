@@ -31,7 +31,7 @@ function Contact() {
                         <span className="contact-icon">📞</span>
                         <div>
                             <strong>Phone</strong>
-                            <p><a href="tel:07907551655" className="legal-link">07907 551 655</a></p>
+                            <p><a href="tel:+447907551655" className="legal-link">07907 551 655</a></p>
                         </div>
                     </div>
                 </div>

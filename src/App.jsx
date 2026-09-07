@@ -390,24 +390,10 @@ function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
             <p className="section-desc">The era of endless scrolling and subscription traps is over. LoveHuddle Ltd is building a radically different model that replaces the algorithm with real‑world interaction.</p>
           </div>
           <div className="features-grid">
-            <div className="feature-card feature-card-paywall">
+            <div className="feature-card">
               <div className="feature-icon">🚫</div>
               <h3>No Paywalls</h3>
               <p>We are ending the 'pay-to-socialize' era. Core features will never be locked away.</p>
-              
-              <div className="paywall-perk-box">
-                <div className="paywall-perk-glow" aria-hidden="true"></div>
-                <div className="paywall-perk-badge">
-                  <span className="paywall-perk-spark">✨</span> Early Member Perk
-                </div>
-                <h4 className="paywall-perk-title">Real connection should be free.</h4>
-                <p className="paywall-perk-text">
-                  That's the belief LoveHuddle is built on. Our core experience — matching, chatting, connecting — is free.
-                </p>
-                <p className="paywall-perk-sub">
-                  We've added a few optional, low-cost features to help keep LoveHuddle running and improving. As a thank-you for joining early, our first 1,000 members get all currently available optional features completely free for three months.
-                </p>
-              </div>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🤝</div>
@@ -419,6 +405,21 @@ function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
               <h3>Bot-Free</h3>
               <p>Free launch‑phase verification to keep LoveHuddle real.</p>
             </div>
+          </div>
+
+          {/* Standalone Early Member Perk Banner */}
+          <div className="early-member-perk-banner">
+            <div className="perk-banner-glow" aria-hidden="true"></div>
+            <div className="perk-banner-header">
+              <span className="perk-badge">✨ Early Member Thank-You Offer</span>
+            </div>
+            <h3 className="perk-banner-title">Real connection should be free.</h3>
+            <p className="perk-banner-lead">
+              That's the belief LoveHuddle is built on. Our core experience — <strong>matching, chatting, connecting</strong> — is free.
+            </p>
+            <p className="perk-banner-sub">
+              We've added a few optional, low-cost features to help keep LoveHuddle running and improving. As a thank-you for joining early, our <span className="perk-highlight">first 1,000 members</span> get all currently available optional features <span className="perk-highlight">completely free for three months</span>.
+            </p>
           </div>
         </RevealSection>
       </section>

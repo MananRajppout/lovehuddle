@@ -262,7 +262,7 @@ function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
         <div className="hero-content animate-fade-in">
           <div className="hero-eyebrow">Beta Launching Autumn 2026</div>
           <h1 className="hero-title">The End of the <span className="gradient-text">Swipe Era</span>.</h1>
-          <p className="hero-subtitle">No Paywalls. No Pressure. Just People.</p>
+          <p className="hero-subtitle">No Catch. No Pressure. Just People.</p>
           <p className="hero-tagline">A New Kind of Hybrid Connection Platform.</p>
           <form className="join-form" onSubmit={handleJoin}>
             <input
@@ -390,10 +390,24 @@ function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
             <p className="section-desc">The era of endless scrolling and subscription traps is over. LoveHuddle Ltd is building a radically different model that replaces the algorithm with real‑world interaction.</p>
           </div>
           <div className="features-grid">
-            <div className="feature-card">
+            <div className="feature-card feature-card-paywall">
               <div className="feature-icon">🚫</div>
               <h3>No Paywalls</h3>
               <p>We are ending the 'pay-to-socialize' era. Core features will never be locked away.</p>
+              
+              <div className="paywall-perk-box">
+                <div className="paywall-perk-glow" aria-hidden="true"></div>
+                <div className="paywall-perk-badge">
+                  <span className="paywall-perk-spark">✨</span> Early Member Perk
+                </div>
+                <h4 className="paywall-perk-title">Real connection should be free.</h4>
+                <p className="paywall-perk-text">
+                  That's the belief LoveHuddle is built on. Our core experience — matching, chatting, connecting — is free.
+                </p>
+                <p className="paywall-perk-sub">
+                  We've added a few optional, low-cost features to help keep LoveHuddle running and improving. As a thank-you for joining early, our first 1,000 members get all currently available optional features completely free for three months.
+                </p>
+              </div>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🤝</div>

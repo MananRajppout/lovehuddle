@@ -1429,6 +1429,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
+  align-items: flex-start;
 }
 
 .feature-card {
@@ -1490,6 +1491,90 @@
   color: var(--lh-text-muted);
   line-height: 1.65;
   font-size: 0.95rem;
+}
+
+/* ─── PAYWALL PERK BOX ───────────────────────── */
+.feature-card-paywall {
+  border: 1px solid rgba(232, 0, 29, 0.28);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25), 0 0 25px rgba(232, 0, 29, 0.08);
+  text-align: left;
+}
+
+.feature-card-paywall .feature-icon {
+  margin-left: 0;
+}
+
+.paywall-perk-box {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.25rem;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(232, 0, 29, 0.08) 0%, rgba(255, 210, 122, 0.04) 100%);
+  border: 1px solid rgba(232, 0, 29, 0.25);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.paywall-perk-box:hover {
+  border-color: rgba(232, 0, 29, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 12px 32px rgba(232, 0, 29, 0.15);
+}
+
+.paywall-perk-glow {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle, rgba(255, 210, 122, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.paywall-perk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffd27a;
+  background: rgba(255, 210, 122, 0.12);
+  border: 1px solid rgba(255, 210, 122, 0.25);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.paywall-perk-spark {
+  font-size: 0.85rem;
+}
+
+.paywall-perk-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  line-height: 1.35;
+  background: var(--lh-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.paywall-perk-text {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(253, 246, 240, 0.88);
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.paywall-perk-sub {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--lh-text-muted);
+  font-weight: 400;
 }
 
 /* ─── ROADMAP ─────────────────────────────────── */

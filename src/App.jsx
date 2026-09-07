@@ -391,11 +391,6 @@ function Landing({ blogPosts, onJoinWaitlist, detectedCountry }) {
           </div>
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">🚫</div>
-              <h3>No Paywalls</h3>
-              <p>We are ending the 'pay-to-socialize' era. Core features will never be locked away.</p>
-            </div>
-            <div className="feature-card">
               <div className="feature-icon">🤝</div>
               <h3>Real Interaction</h3>
               <p>Moving beyond the screen. Trademarked architecture built for real‑world connection.</p>
